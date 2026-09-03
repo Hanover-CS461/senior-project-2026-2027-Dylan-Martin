@@ -9,7 +9,8 @@ lives client-side in IndexedDB.
 **MongoDB** - database for user metadata and public keys only (no messages stored) \
 **WebSockets** - For the message delivery and user endpoint connections \
 **Node.js** - backend for websockets \
-**IndexedDB** - client-side storage for private keys, ephemeral keys, and encrypted message history 
+**IndexedDB** - client-side storage for private keys, ephemeral keys, and encrypted message history \
+**WS** - Create WebSocket server for clients to communicate with
 
 ## Phase 0 — Crypto model (decide first, shapes everything)
 - Hybrid scheme: each user generates an ECDH keypair client-side (P-256 via Web Crypto API; X25519 isn't uniformly supported in SubtleCrypto). Public key -> server; private key stays client-side in IndexedDB (not localStorage — XSS-readable).
@@ -34,27 +35,3 @@ lives client-side in IndexedDB.
 10. Friends list (optional but cheap) — limits who you can message, gives the UI a home page.
 11. Tests: known-answer crypto tests (fixed inputs -> expected ciphertext), auth tests, WebSocket integration tests.
 12. Deploy (Render/Railway/Vercel or similar) so it's demoable, not just localhost.
-
-# Mania Game (Story Game Maybe)
----
-everhood
-A story game where the conversations and/or combat involves playing a mania game of differing styles perhaps. Within the speech there could possibly be moments where a conversation option means the mania
-game. Similar to Skyrim with the persuading and speech levels. Although instead of a certain level this is instead an accuracy thing. It could be thought of similar to Everhood where battles are the rhythm
-game. I want to add it a little more though. 
-
-## Stack Framework
-**Not yet decided need help**
-**Want it to be a pc only game but run on both Windows, Linux, and Apple MacOS to keep building simple I dont want to mess with packaging/building the game just an easy download hopefully. If possible**
-
-## Style
-The game will be a pixel 2d artstyle that includes themes of going through Hanover CS classes and graduating. Perhaps I shall ask the professors if I can create characters that model or are inspired by 
-them. Of course I might need to keep it lightweight I dont have years to work on this.
-
-## Language
-I am a **BIG** fan of the C programming language. My knowledge is very small but I would hope this project would help. IDK maybe use SDL that could be really good we have to make a tutorial on a library
-SDL could be that library perhaps. SDL setup has given me trouble in the past but not this time.
-
-### Planned Steps
-1. Game Storyboard
-2. Create Characters (concept)
-3. Other things I dont feel like thinking of right now.
