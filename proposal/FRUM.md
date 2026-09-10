@@ -1,4 +1,6 @@
-# Real-Time EE2E 
+---
+---
+# FRUM
 ---
 Web chat that utilizes asymmetric encryption where each user has a stored private/public key. Not shared with the server at all. Server is specifically for sending
 public keys and encrypted messages. Threat model: the server is the adversary (it can see metadata, never plaintext); the browser is trusted. Message history
