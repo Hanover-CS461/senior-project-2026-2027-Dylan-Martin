@@ -4,7 +4,7 @@
 
 Planning-stage scaffold for a CS461 senior project (single-owner academic repo). There is **no application source code yet**: no root `package.json`, no build/test/lint tooling, no CI. Do not go looking for entrypoints, scripts, or tests — they do not exist.
 
-- `proposal/ideas.md` is the current source of intent. It sketches an end-to-end-encrypted real-time web chat (React + Node.js/WebSockets + MongoDB) and a secondary game idea. The stack choices there are tentative proposals, not settled decisions — check this file before implementing anything.
+- `docs/FRUM.md` is the current source of intent. It sketches an end-to-end-encrypted real-time web chat (React + Node.js/WebSockets + MongoDB) and a secondary game idea. The stack choices there are tentative proposals, not settled decisions — check this file before implementing anything.
 - Don't scaffold a project or add root-level dependencies without confirming the stack direction first; it is undecided.
 
 ## OpenCode setup
