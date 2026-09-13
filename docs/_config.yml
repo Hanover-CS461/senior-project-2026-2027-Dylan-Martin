@@ -14,6 +14,7 @@ plugins:
   - jekyll-relative-links
   - jekyll-seo-tag
 
+baseurl: /senior-project-2026-2027-Dylan-Martin
 title: FRUMious
 description: Jekyll GitHub Page for Senior Project Markdown files.
 github_username: dylanbrokie
