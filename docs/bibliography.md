@@ -17,6 +17,8 @@ layout: default
 
 **Relevance:** The chat frontend depends on React's component model and effect system. Effects handle mounting and unmounting the WebSocket connection (entry 3) and updating message state as ciphertext arrives, without the user leaving the chat view. React's declarative rendering keeps the UI in sync with message history as it is decrypted from IndexedDB on load.
 
+---
+
 ## 2. MongoDB — Official Documentation
 
 **Link:** [https://www.mongodb.com/docs/][Mongo]
@@ -241,6 +243,34 @@ layout: default
 
 ---
 
+## 18. Signal — Technical Information
+
+**Link:** [https://signal.org/docs/][Signal]
+
+**Source type:** Primary source. Official technical documentation published by Signal Messenger LLC, the organization that develops the Signal messaging service.
+
+**Relation to app:** Signal is the primary comparable solution against which FRUM is contrasted in the proposal. This page is the official summary of how Signal's servers, clients, and protocol fit together.
+
+**Description:** The Signal technical documentation describes the service's architecture: how the Signal Protocol (X3DH key agreement and the Double Ratchet, entry 16) provides end-to-end encryption, how safety numbers are derived and verified, and how the server is designed to handle only encrypted content and metadata, never plaintext.
+
+**Relevance:** Establishes the reference point for the proposal's comparable-solutions section: the property FRUM shares with Signal (ciphertext-only servers, fingerprint verification) and the properties FRUM deliberately simplifies (static-static ECDH instead of X3DH and the Double Ratchet, no forward secrecy, history stored only client-side).
+
+---
+
+## 19. WhatsApp — Encryption Overview
+
+**Link:** [https://www.whatsapp.com/security/WhatsApp-Security-Whitepaper.pdf][WhatsApp]
+
+**Source type:** Primary source. Security whitepaper published by WhatsApp, a service of Meta Platforms, Inc.
+
+**Relation to app:** WhatsApp is the second comparable solution contrasted with FRUM in the proposal. The whitepaper documents the exact encryption mechanisms WhatsApp relies on.
+
+**Description:** The whitepaper describes how WhatsApp implements end-to-end encryption using the Signal Protocol, including key generation, key exchange, session state, and the verification of peers through security codes, and summarizes what information WhatsApp's servers do and do not see.
+
+**Relevance:** Provides the citable basis for the proposal's comparison: WhatsApp and FRUM share end-to-end encryption and peer verification, while differing on openness, identity model (phone numbers), metadata collection, and where message history is stored.
+
+---
+
 [facebook]: https://www.meta.com/about/
 [React]: https://react.dev/
 [Mongo]: https://www.mongodb.com/docs/
@@ -259,3 +289,5 @@ layout: default
 [SSHFP]: https://arxiv.org/abs/2208.08846
 [X3DH]: https://signal.org/docs/specifications/x3dh/
 [OTR]: https://otr.cypherpunks.ca/otr-wpes.pdf
+[Signal]: https://signal.org/docs/
+[WhatsApp]: https://www.whatsapp.com/security/WhatsApp-Security-Whitepaper.pdf

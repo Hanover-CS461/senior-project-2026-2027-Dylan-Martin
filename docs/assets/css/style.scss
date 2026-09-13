@@ -1,0 +1,162 @@
+---
+---
+
+@import "{{ site.theme }}";
+
+body {
+  background-color: #090909;
+  padding: 0;
+  font-family: "Courier New", monospace;
+  font-size: 15px;
+  color: #f3c99f;
+  line-height: 1.2;
+}
+
+.wrapper {
+  width: 850px;
+  margin: 40px auto 0;
+  background: #2c211c;
+  border: 2px solid #d27742;
+
+  display: flex;
+  flex-wrap: wrap;
+}
+
+header {
+  width: 100%;
+  float: none;
+  position: static;
+
+  padding: 35px 50px;
+  box-sizing: border-box;
+
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  text-align: left;
+}
+ 
+section {
+  width: 100%;
+  float: none;
+  clear: both;
+  position: static;
+
+  padding: 35px 30px 60px;
+  box-sizing: border-box;
+}
+
+section li strong {
+  text-align: left;
+  margin: 0;
+  color: #d87534;
+  font-weight: none;
+}
+ 
+a {
+  color: #d87534;
+  text-decoration: none;
+}
+
+a:hover, a:focus {
+  color: #ffad6c;
+  text-decoration: underline;
+}
+
+h1, h2, h3, h4, h5, h6 {
+  color: #ffd5ae;
+  font-family: "Courier New", monospace;
+}
+
+h1 {
+  font-size: 32px;
+  text-align: center;
+}
+
+h2 {
+  color: #f0c79e;
+  border-bottom: 1px solid #d27742;
+}
+
+p {
+  margin: 35px 30px 25px 20px;
+}
+
+ol, ul {
+  margin: 20px 30px 25px 0;
+  padding-left: 25px;
+  list-style-position: outside;
+}
+
+li {
+  text-align: left;
+}
+
+blockquote {
+  border-left: 3px solid #d87534;
+  margin: 15px 0;
+  padding: 8px 15px;
+  background: #3b2a23;
+  color: #e9c29e;
+}
+
+pre {
+  padding: 10px;
+  border: 1px solid #a85831;
+  border-radius: 0;
+}
+
+th, td {
+  padding: 6px 10px;
+  border: 1px solid #a85831;
+}
+
+th {
+  background: #82543f;
+  color: #ffd5ae;
+}
+
+footer {
+  width: 100%;
+  float: none;
+  position: static;
+  bottom: auto;
+
+  box-sizing: border-box;
+  padding: 20px;
+  border-top: 1px solid #d27742;
+
+  text-align: center;
+}
+
+footer p {
+  margin: 0;
+}
+
+@media screen and (max-width: 1050px) {
+
+  .wrapper {
+    width: calc(100% - 20px);
+  }
+
+}
+
+@media screen and (max-width: 600px) {
+
+  body {
+    font-size: 14px;
+  }
+
+  header {
+    padding: 15px;
+  }
+
+
+  footer p {
+    margin: 0;
+  }
+  section {
+    padding: 15px;
+  }
+
+}
