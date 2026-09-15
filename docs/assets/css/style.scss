@@ -49,8 +49,19 @@ section {
 section li strong {
   text-align: left;
   margin: 0;
-  color: #d87534;
+  color: #FFAD6C;
   font-weight: none;
+}
+
+section p strong {
+  text-align: left;
+  margin: 0;
+  color: #FFAD6C;
+  font-weight: none;
+}
+
+section code {
+  color: #857D7A;
 }
  
 a {
@@ -59,7 +70,7 @@ a {
 }
 
 a:hover, a:focus {
-  color: #ffad6c;
+  color: #6CBDFF;
   text-decoration: underline;
 }
 
