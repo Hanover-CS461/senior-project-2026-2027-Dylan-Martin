@@ -201,21 +201,7 @@ layout: default
 
 ---
 
-## 15. Neef & Wisiol — Oh SSH-it, What's My Fingerprint? (2022)
-
-**Link:** [https://arxiv.org/abs/2208.08846][SSHFP]
-
-**Source type:** Peer-reviewed paper. Presented at CANS 2022, published in Springer LNCS vol. 13641.
-
-**Relation to app:** Studies the weak point in my design: whether users actually verify key fingerprints during TOFU. My app displays SHA-256 fingerprints for out-of-band comparison; this paper provides evidence for how rarely equivalent verification steps are performed in the wild.
-
-**Description:** A large-scale Internet study measuring how often SSH host key fingerprints are actually verified by users (via SSHFP DNS records), finding that deployment is rare and often unprotected by DNSSEC.
-
-**Relevance:** Lets the analysis make an evidence-backed claim about the trust ceiling of TOFU: the fingerprint comparison is the human bottleneck, not the cryptography.
-
----
-
-## 16. Marlinspike & Perrin — The X3DH Key Agreement Protocol (2016)
+## 15. Marlinspike & Perrin — The X3DH Key Agreement Protocol (2016)
 
 **Link:** [https://signal.org/docs/specifications/x3dh/][X3DH]
 
@@ -229,21 +215,7 @@ layout: default
 
 ---
 
-## 17. Borisov, Goldberg & Brewer — Off-the-Record Communication, or, Why Not To Use PGP (2004)
-
-**Link:** [https://otr.cypherpunks.ca/otr-wpes.pdf][OTR]
-
-**Source type:** Peer-reviewed paper. Presented at the 2004 ACM Workshop on Privacy in the Electronic Society (WPES).
-
-**Relation to app:** The classic argument that casual online conversation should be encrypted *and* deniable/ephemeral. My app stores ciphertext history client-side by design; this paper frames the trade-off between keeping message history and providing deniability.
-
-**Description:** Introduces Off-the-Record messaging, arguing that PGP-style long-lived keys and signatures are the wrong properties for chat, and that instant messaging should instead provide perfect forward secrecy and repudiability.
-
-**Relevance:** Positions my project in the end-to-end messaging literature and gives the analysis the vocabulary (perfect forward secrecy, deniability) to state precisely what my app does and does not provide.
-
----
-
-## 18. Signal — Technical Information
+## 17. Signal — Technical Information
 
 **Link:** [https://signal.org/docs/][Signal]
 
@@ -257,7 +229,7 @@ layout: default
 
 ---
 
-## 19. WhatsApp — Encryption Overview
+## 18. WhatsApp — Encryption Overview
 
 **Link:** [https://www.whatsapp.com/security/WhatsApp-Security-Whitepaper.pdf][WhatsApp]
 
@@ -286,8 +258,6 @@ layout: default
 [NIST56A]: https://csrc.nist.gov/pubs/sp/800/56/a/r3/final
 [RFC7250]: https://www.rfc-editor.org/rfc/rfc7250
 [RFC4251]: https://www.rfc-editor.org/rfc/rfc4251
-[SSHFP]: https://arxiv.org/abs/2208.08846
 [X3DH]: https://signal.org/docs/specifications/x3dh/
-[OTR]: https://otr.cypherpunks.ca/otr-wpes.pdf
 [Signal]: https://signal.org/docs/
 [WhatsApp]: https://www.whatsapp.com/security/WhatsApp-Security-Whitepaper.pdf
