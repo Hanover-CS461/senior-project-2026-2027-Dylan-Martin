@@ -46,7 +46,7 @@ jobs:
     needs: build-docs
     steps:
       - name: Build slides
-        run: marp slides.md -o _site/slides/index.html
+        run: marp docs/slides.md -o _site/slides/index.html
         working-directory: docs/slides
 
       - name: Copy slide assets
