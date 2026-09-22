@@ -9,4 +9,4 @@ layout: default
 
 [project]: FRUM.html
 [biblio]: bibliography.html
-[slide]: slides.html
+[slides]: slides.html
