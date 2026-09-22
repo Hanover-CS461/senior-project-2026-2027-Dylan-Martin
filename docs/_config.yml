@@ -20,3 +20,6 @@ description: Jekyll GitHub Page for Senior Project Markdown files.
 github_username: dylanbrokie
 
 theme: jekyll-theme-minimal
+
+exclude:
+  - slides
