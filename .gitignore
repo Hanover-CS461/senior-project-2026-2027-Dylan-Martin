@@ -1,2 +1,7 @@
 docs/_site
 docs/notes.txt
+
+# Act Runner — secrets locais
+.secrets
+.env.local
+.env.production
