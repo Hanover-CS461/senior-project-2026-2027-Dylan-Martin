@@ -10,5 +10,5 @@ layout: default
 
 [project]: FRUM.html
 [biblio]: bibliography.html
-[slides]: slides/
+[slides]: slides.html
 [tutorial]: tutorial/

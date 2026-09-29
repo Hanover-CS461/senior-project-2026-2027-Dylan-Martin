@@ -31,7 +31,7 @@ jobs:
         run: npm install -g --html @marp-team/marp-cli
 
       - name: Build slides
-        run: marp slides.md -o ../_site
+        run: marp slides.md -o ../_site/slides.html
         working-directory: docs/slides
 
       - name: Upload pages
