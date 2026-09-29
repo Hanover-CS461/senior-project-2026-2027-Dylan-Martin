@@ -1,6 +1,5 @@
 ---
 marp: true
-theme: gaia
 paginate: true
 html: true
 style: |
