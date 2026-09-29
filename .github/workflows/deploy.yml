@@ -31,14 +31,8 @@ jobs:
         run: npm install -g --html @marp-team/marp-cli
 
       - name: Build slides
-        run: marp slides.md -o _site/slides/index.html
+        run: marp slides.md -o ../_site
         working-directory: docs/slides
-
-      - name: Copy slide assets
-        run: |
-          mkdir -p _site/slides/assets
-          cp -r slides/assets/. _site/slides/assets/
-        working-directory: docs
 
       - name: Upload pages
         uses: actions/upload-pages-artifact@v3
