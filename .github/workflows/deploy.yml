@@ -25,7 +25,7 @@ jobs:
       - name: Setup Node
         uses: actions/setup-node@v4
         with:
-          node-verision: '22'
+          node-version: '22'
 
       - name: Install marp-cli
         run: npm install -g --html @marp-team/marp-cli

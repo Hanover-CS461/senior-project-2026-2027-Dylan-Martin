@@ -1,5 +1,6 @@
 ---
 marp: true
+layout: default
 paginate: true
 html: true
 style: |
