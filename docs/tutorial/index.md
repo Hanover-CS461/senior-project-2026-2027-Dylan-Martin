@@ -8,7 +8,7 @@ Every modern browser ships a native cryptography engine, and the **Web Crypto AP
 
 ## Target audience
 
-This tutorial is for **web developers who write JavaScript comfortably** — you should be at home with `async`/`await`, functions, and the browser DevTools console — **and who understand cryptography at a conceptual level**: you know what a public key, a private key, and symmetric versus asymmetric encryption are, perhaps from a security course (such as CompTIA Security+) or from hands-on tools like SSH and OpenSSL. You have **no** prior crypto-*API* experience, and you do **not** need React, Node.js, a bundler, or any third-party package. If you can open a browser console, you can follow along.
+This tutorial is for **web developers who write JavaScript comfortably** — you should be at home with `async`/`await`, functions, and the browser DevTools console — **and who understand cryptography at a conceptual level**: you know what a public key, a private key, and symmetric versus asymmetric encryption are, or you have **no** prior crypto-*API* experience, and you do **not** need React, Node.js, a bundler, or any third-party package. If you can open a browser console, you can follow along.
 
 The tutorial is written to be *run*, not read — every page ends with a hands-on checkpoint that pushes you to retype, predict, break, and rebuild the code. By page 6 you will have built and run a working two-party encrypted exchange in your browser.
 
@@ -44,9 +44,9 @@ The tutorial is eight pages, meant to be read in order. Pages 1–5 and 7 run en
 Work through each page with the same loop:
 
 1. **Read** the section and its code block.
-2. **Retype** the snippet into your console — do not paste. Retyping forces you to notice every argument.
-3. **Predict** the output before pressing Enter, then check. Wrong predictions are where the learning happens.
-4. **Break it** — change an input, delete an argument, observe the failure. Errors are information.
+2. **Retype** the snippet into your console.
+3. **Predict** the output before pressing Enter, then check.
+4. **Break it** — change an input, delete an argument, observe the failure.
 5. **Rebuild** the key snippets from memory after finishing the page.
 6. **Explain** each page's concept in your own words before moving on. If you cannot explain it, you have not learned it yet.
 

@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang='en'>
+<head>
+	<link rel="stylesheet" href="style.css">
+	<meta charset="utf-8">
+	<title>Hash Playground</title>
+</head>
+<body>
+	<h1>ALICE</h1>
+	<h3>Copy whole thing and share with Bob</h3>
+	<pre id="publicKey"></pre>
+	<pre id="hashOutput">Verification</pre>
+	<input type="text" id="hashMessage" placeholder="Type something">
+	<button id="hashButton">Hash it</button>
+	<pre id="importOutput">Import Key</pre>
+	<input type="text" id="importMessage" placeholder="Paste shared public key">
+	<button id="importButton">Import Key</button>
+	<pre id="encryptOutput">Encryption</pre>
+	<input type="text" id="textMessage" placeholder="Message to encrypt">
+	<button id="encryptButton">Encrypt</button>
+	<pre id="sharedIV"></pre>
+	
+	<script>
+		async function generateKeyPair() {
+			return await crypto.subtle.generateKey(
+				{
+					name: "ECDH",
+					namedCurve: "P-256"
+				},
+				false,
+				["deriveKey", "deriveBits"]);
+		}
+		async function exportPublicKey(keyPair) {
+			return await crypto.subtle.exportKey(
+				"jwk",
+				keyPair.publicKey);
+		}
+
+		function toHex(buf) {
+			const bytes = new Uint8Array(buf);
+			let hex = '';
+			for (const byte of bytes) {
+				hex += byte.toString(16).padStart(2, '0');
+			}
+			return hex;
+		} 
+
+		async function importPublicKey(key) {
+			return await crypto.subtle.importKey(
+				"jwk",
+				key,
+				{
+					name: "ECDH",
+					namedCurve: "P-256"
+				},
+				false,
+				[]);
+		}
+
+		async function deriveSecret(privateKey, publicKey) {
+			return await crypto.subtle.deriveBits(
+				{
+					name: "ECDH",
+					public: publicKey
+				},
+				privateKey,
+				256);
+		}
+		
+		async function deriveSymKey(salt, HKDF) {
+			return await crypto.subtle.deriveKey(
+				{
+					name: "HKDF",
+					hash: "SHA-256",
+					salt: salt,
+					info: new TextEncoder().encode("derived key")
+				},
+				HKDF,
+				{
+					name: "AES-GCM",
+					length: 256
+				},
+				false,
+				['encrypt', 'decrypt']);
+		}
+
+		async function importHKDF(secret) {
+			return await crypto.subtle.importKey(
+				"raw",
+				secret,
+				"HKDF",
+				false,
+				["deriveKey"]);
+		}
+		
+		async function main() {
+			const salt = new Uint8Array(32);
+
+			const aliceKeyPair = await generateKeyPair();
+			const alicePublicKey = await exportPublicKey(aliceKeyPair);
+			document.getElementById("publicKey").textContent = JSON.stringify(alicePublicKey);
+
+
+
+			const hashButton = document.getElementById("hashButton");
+			const hashInput = document.getElementById("hashMessage");
+			const hashOutput = document.getElementById("hashOutput");
+
+			hashButton.addEventListener('click', async () => {
+				const bytes = new TextEncoder().encode(hashInput.value);
+				const digest = await crypto.subtle.digest("SHA-256", bytes);
+				hashOutput.textContent = toHex(digest);
+			});
+
+
+
+			const importButton = document.getElementById("importButton");
+			const importInput = document.getElementById("importMessage");
+			const importOutput = document.getElementById("importOutput");
+
+			importButton.addEventListener('click', async() => {
+				const importedPublicKey = await importPublicKey(JSON.parse(importInput.value));
+				const sharedSecret = await deriveSecret(aliceKeyPair.privateKey, importedPublicKey);
+				const HKDFKey = await importHKDF(sharedSecret);
+				const symmetricKey = await deriveSymKey(salt, HKDFKey);
+				console.log(symmetricKey);
+			});
+
+		}
+		main();
+	</script>
+</body>
+</html>
