@@ -2,7 +2,6 @@
 <html lang='en'>
 <head>
 	<link rel="stylesheet" href="style.css">
-	<meta charset="utf-8">
 	<title>Hash Playground</title>
 </head>
 <body>
@@ -16,9 +15,12 @@
 	<input type="text" id="importMessage" placeholder="Paste shared public key">
 	<button id="importButton">Import Key</button>
 	<pre id="encryptOutput">Encryption</pre>
-	<input type="text" id="textMessage" placeholder="Message to encrypt">
+	<input type="text" id="encryptMessage" placeholder="Message to encrypt">
 	<button id="encryptButton">Encrypt</button>
-	<pre id="sharedIV"></pre>
+	<pre id="decryptOutput">Decrypt</pre>
+	<input type="text" id="decryptMessage" placeholder="Message to decrypt">
+	<button id="decryptButton">Decrypt</button>
+    
 	
 	<script>
 		async function generateKeyPair() {
@@ -67,6 +69,15 @@
 				256);
 		}
 		
+		async function importHKDF(secret) {
+			return await crypto.subtle.importKey(
+				"raw",
+				secret,
+				"HKDF",
+				false,
+				["deriveKey"]);
+		}
+
 		async function deriveSymKey(salt, HKDF) {
 			return await crypto.subtle.deriveKey(
 				{
@@ -84,17 +95,30 @@
 				['encrypt', 'decrypt']);
 		}
 
-		async function importHKDF(secret) {
-			return await crypto.subtle.importKey(
-				"raw",
-				secret,
-				"HKDF",
-				false,
-				["deriveKey"]);
-		}
-		
+        async function encryptMessage(key, iv, messageBytes) {
+            return await crypto.subtle.encrypt(
+                {
+                    name: "AES-GCM",
+                    iv: iv
+                },
+                key,
+                messageBytes);
+        }
+
+        async function decryptMessage(key, iv, data) {
+            return await crypto.subtle.decrypt(
+                {
+                    name: "AES-GCM",
+                    iv: iv
+                },
+                key,
+                data);
+        }
+
 		async function main() {
-			const salt = new Uint8Array(32);
+            const encoder = new TextEncoder();
+            let symmetricKey = null;
+            const salt = new Uint8Array(32);
 
 			const aliceKeyPair = await generateKeyPair();
 			const alicePublicKey = await exportPublicKey(aliceKeyPair);
@@ -122,11 +146,41 @@
 				const importedPublicKey = await importPublicKey(JSON.parse(importInput.value));
 				const sharedSecret = await deriveSecret(aliceKeyPair.privateKey, importedPublicKey);
 				const HKDFKey = await importHKDF(sharedSecret);
-				const symmetricKey = await deriveSymKey(salt, HKDFKey);
-				console.log(symmetricKey);
+				symmetricKey = await deriveSymKey(salt, HKDFKey);
+                importOutput.textContent = "Import done";
 			});
 
-		}
+			const encryptButton = document.getElementById("encryptButton");
+			const encryptInput = document.getElementById("encryptMessage");
+			const encryptOutput = document.getElementById("encryptOutput");
+
+            encryptButton.addEventListener('click', async() => {
+                const message = encryptInput.value;
+                const messageBytes = encoder.encode(message);
+                const iv = crypto.getRandomValues(new Uint8Array(12));
+                const encryptedMessage = await encryptMessage(symmetricKey, iv, messageBytes);
+                const encryptedMessageBytes = toHex(encryptedMessage);
+                encryptOutput.textContent = JSON.stringify({
+                iv: Array.from(iv),
+                encryptedMessage: Array.from(new Uint8Array(encryptedMessage))
+                });
+		    });
+
+
+			const decryptButton = document.getElementById("decryptButton");
+			const decryptInput = document.getElementById("decryptMessage");
+			const decryptOutput = document.getElementById("decryptOutput");
+
+            decryptButton.addEventListener('click', async() => {
+                const information = JSON.parse(decryptInput.value);
+                const iv = new Uint8Array(information.iv);
+                const encryptedMessage = new Uint8Array(information.encryptedMessage);
+                const decryptedMessage = await decryptMessage(symmetricKey, iv, encryptedMessage);
+                const plainText = new TextDecoder().decode(decryptedMessage);
+                decryptOutput.textContent = plainText;
+            });
+
+        }
 		main();
 	</script>
 </body>
