@@ -159,7 +159,6 @@
                 const messageBytes = encoder.encode(message);
                 const iv = crypto.getRandomValues(new Uint8Array(12));
                 const encryptedMessage = await encryptMessage(symmetricKey, iv, messageBytes);
-                const encryptedMessageBytes = toHex(encryptedMessage);
                 encryptOutput.textContent = JSON.stringify({
                 iv: Array.from(iv),
                 encryptedMessage: Array.from(new Uint8Array(encryptedMessage))

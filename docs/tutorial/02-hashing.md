@@ -59,7 +59,7 @@ The result is an `ArrayBuffer` of exactly 32 bytes, no matter how long the input
 
 ## Step 3 — Display the digest as hex
 
-An `ArrayBuffer` is a lump of memory — useful to a program, unreadable to a human. The standard way to *display* bytes is **hex**: each byte becomes two hex characters. The browser has no built-in bytes-to-hex function, browsers do not), so you write a small helper once and reuse it everywhere. The readable version is a plain loop:
+An `ArrayBuffer` is a lump of memory — useful to a program, unreadable to a human. The standard way to *display* bytes is **hex**: each byte becomes two hex characters. The browser has no built-in bytes-to-hex function, so you write a small helper once and reuse it everywhere. The readable version is a plain loop:
 
 ```js
 function toHex(buf) {
@@ -94,7 +94,7 @@ toHex(await crypto.subtle.digest('SHA-256', new TextEncoder().encode('hello worl
 // b94d27b9934d3e08a52e52d7da7dabfac484efe37a5380ee9088f7ace2efcde9
 ```
 
-`b94d27b9...cde9` is the SHA-256 digest of `hello world` is published everywhere. If your output matches, then your encode → digest → hex pipeline is byte-for-byte correct — no guessing required. This is the *known-answer test*: verify your code against a value that is already trusted. You will use this exact technique on the later pages.
+`b94d27b9...cde9` is the published SHA-256 digest of `hello world`. If your output matches, then your encode → digest → hex pipeline is byte-for-byte correct — no guessing required. This is the *known-answer test*: verify your code against a value that is already trusted. You will use this exact technique on the later pages.
 
 ## The avalanche effect
 

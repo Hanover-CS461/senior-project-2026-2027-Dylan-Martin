@@ -120,9 +120,9 @@
             let symmetricKey = null;
             const salt = new Uint8Array(32);
 
-			const aliceKeyPair = await generateKeyPair();
-			const alicePublicKey = await exportPublicKey(aliceKeyPair);
-			document.getElementById("publicKey").textContent = JSON.stringify(alicePublicKey);
+			const bobKeyPair = await generateKeyPair();
+			const bobPublicKey = await exportPublicKey(bobKeyPair);
+			document.getElementById("publicKey").textContent = JSON.stringify(bobPublicKey);
 
 
 
@@ -144,7 +144,7 @@
 
 			importButton.addEventListener('click', async() => {
 				const importedPublicKey = await importPublicKey(JSON.parse(importInput.value));
-				const sharedSecret = await deriveSecret(aliceKeyPair.privateKey, importedPublicKey);
+				const sharedSecret = await deriveSecret(bobKeyPair.privateKey, importedPublicKey);
 				const HKDFKey = await importHKDF(sharedSecret);
 				symmetricKey = await deriveSymKey(salt, HKDFKey);
                 importOutput.textContent = "Import done";
@@ -159,7 +159,6 @@
                 const messageBytes = encoder.encode(message);
                 const iv = crypto.getRandomValues(new Uint8Array(12));
                 const encryptedMessage = await encryptMessage(symmetricKey, iv, messageBytes);
-                const encryptedMessageBytes = toHex(encryptedMessage);
                 encryptOutput.textContent = JSON.stringify({
                 iv: Array.from(iv),
                 encryptedMessage: Array.from(new Uint8Array(encryptedMessage))

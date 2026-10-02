@@ -24,7 +24,7 @@ Cryptography is only as trustworthy as the code that performs it. This page expl
 | [`crypto.getRandomValues()`](https://developer.mozilla.org/en-US/docs/Web/API/Crypto/getRandomValues) | everywhere | Random numbers — you will use these for IVs on page 3 |
 | `crypto.subtle` | secure contexts only | All real cryptography: hashing, encryption, key agreement |
 
-Try the follwing in any console (My shortcut is ctrl + shift + I):
+Try the following in any console (my shortcut is Ctrl + Shift + I):
 
 ```js
 window.crypto.subtle

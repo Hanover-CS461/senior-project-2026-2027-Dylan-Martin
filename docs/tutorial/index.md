@@ -61,9 +61,9 @@ Every page ends with a **Hands-on checkpoint** built from this loop.
 | [3 — Symmetric Encryption with AES-GCM](03-symmetric-encryption.html) | `generateKey`, IVs, tamper detection | Console snippets | Ready |
 | [4 — Asymmetric Keys with ECDH](04-asymmetric-keys.html) | Key pairs, `extractable`, JWK | Console snippets | Ready |
 | [5 — Deriving a Shared Secret](05-key-agreement.html) | ECDH + HKDF, the NIST SP 800-56A footgun | Console snippets | Ready |
-| 6 — Putting It Together | Two-party encrypted exchange | Two HTML files | Coming soon |
-| 7 — Practice Exercises | Test yourself | Console exercises | Coming soon |
-| 8 — Summary and Further Reading | Recap and official docs | Read | Coming soon |
+| [6 — Putting It Together](06-putting-it-together.html) | Two-party encrypted exchange | Two HTML files | Ready |
+| [7 — Practice Exercises](07-practice-exercises.html) | Test yourself | Console exercises | Ready |
+| [8 — Summary and Further Reading](08-summary-and-further-reading.html) | Recap and official docs | Read | Ready |
 
 ## About the examples
 
