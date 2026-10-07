@@ -2,10 +2,14 @@
 
 ## State of this repo
 
-Planning-stage scaffold for a CS461 senior project (single-owner academic repo). There is **no application source code yet**: no root `package.json`, no build/test/lint tooling, no CI. Do not go looking for entrypoints, scripts, or tests — they do not exist.
+CS461 senior project (single-owner academic repo). The frontend has started; the backend has not.
 
-- `docs/FRUM.md` is the current source of intent. It sketches an end-to-end-encrypted real-time web chat (React + Node.js/WebSockets + MongoDB) and a secondary game idea. The stack choices there are tentative proposals, not settled decisions — check this file before implementing anything.
-- Don't scaffold a project or add root-level dependencies without confirming the stack direction first; it is undecided.
+- `FRUM/frontend/React/` is a working Vite + React 19 + TypeScript app with its own `package.json` (`dev`, `build`, `lint`, `preview`) and `oxlint` config. This is the only package manifest — there is still no root `package.json`, and no CI (`.github/workflows/` is empty).
+- `FRUM/backend/` exists but is empty; the Node.js/WebSocket relay has not been started.
+- `docs/FRUM.md` is the source of intent for the overall system. It sketches an end-to-end-encrypted real-time web chat (React + Node.js/WebSockets + MongoDB) and a secondary game idea. Treat its stack choices as proposals, not settled decisions.
+- `docs/WELCOME-PAGE.md` is the settled design brief for the Victorian-styled welcome page (palette, typography, logo treatment, interaction). Follow it when building that page.
+- Run the frontend from its own directory: `cd FRUM/frontend/React && npm run dev`. There is no root-level script.
+- Don't scaffold new top-level projects or add root-level dependencies without confirming direction first.
 
 ## OpenCode setup
 
@@ -14,5 +18,6 @@ Planning-stage scaffold for a CS461 senior project (single-owner academic repo).
 
 ## Conventions
 
-- The only file type agents are permitted to write here is Markdown (per the deliberate agent's edit rules).
+- The only file type agents are permitted to write here is Markdown (per the deliberate agent's edit rules). Editing code (`.tsx`, `.css`, `.gitignore`, etc.) requires an edit-capable session.
+- The Vite dependency cache must be ignored, not committed. `FRUM/.vite/` and `FRUM/frontend/.vite/` currently exist and `FRUM/.gitignore` does not list `.vite` — add it in a build session.
 - If the user asks to deliberate, keep sessions in planning mode — do not proactively propose scaffolding or implementation.
