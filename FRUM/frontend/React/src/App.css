@@ -33,6 +33,12 @@
 	color-scheme: light;
 }
 
+*,
+*::before,
+*::after {
+	box-sizing: border-box;
+}
+
 /* Neutralize Vite's default #root styling from index.css */
 #root {
 	width: 100%;
@@ -93,7 +99,7 @@ body {
 
 .plate__fold path {
 	fill: none;
-	stroke: color-mix(in srgb, var(--ink), transparent 84%);
+	stroke: color-mix(in srgb, var(--ink), transparent 54%);
 	stroke-width: 1;
 }
 
@@ -153,6 +159,7 @@ body {
 	font-size: 1.05rem;
 	letter-spacing: 0.08em;
 	color: var(--paper);
+	text-decoration: none;
 	background-color: var(--oxblood);
 	border: none;
 	border-radius: 47% 53% 52% 48% / 51% 49% 53% 47%;
@@ -204,6 +211,38 @@ body {
 	border: 0;
 	border-top: 1px solid var(--charcoal);
 	box-shadow: 0 3px 0 -1px var(--gold);
+}
+
+/* Login placeholder (kept as-is). */
+.login {
+	min-height: 100svh;
+	display: grid;
+	place-items: center;
+	padding: 2rem;
+	background-color: var(--oxblood);
+	color: var(--paper);
+	text-align: center;
+}
+
+.login__card {
+	max-width: 30rem;
+}
+
+.login__title {
+	margin: 0;
+	font-family: var(--display);
+	font-weight: 400;
+	font-size: clamp(2rem, 6vw, 3rem);
+	letter-spacing: 0.14em;
+	color: var(--paper);
+}
+
+.login__note {
+	margin: 0.75rem 0 0;
+	font-family: var(--display);
+	font-style: italic;
+	font-size: clamp(1rem, 2.4vw, 1.25rem);
+	color: color-mix(in srgb, var(--paper), transparent 25%);
 }
 
 @media (prefers-reduced-motion: reduce) {

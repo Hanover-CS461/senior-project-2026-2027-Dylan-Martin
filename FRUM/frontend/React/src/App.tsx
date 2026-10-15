@@ -4,6 +4,7 @@ import diamond from './assets/diamond.png'
 import heart from './assets/heart.png'
 import logo from './assets/FRUM.png'
 import spade from './assets/spade.png'
+import { Routes, Route, Link } from 'react-router';
 
 function WelcomePage() {
 	return (
@@ -28,9 +29,9 @@ function WelcomePage() {
 					<img className="plate__logo" src={logo} alt="FRUM" />
 				</h1>
 
-				<button type="button" className="plate__button">
+				<Link to="/login" className="plate__button">
 					Enter
-				</button>
+				</Link>
 
 				<div className="plate__body">
 					<p className="plate__tagline">Private correspondence, sealed end to end.</p>
@@ -45,8 +46,26 @@ function WelcomePage() {
 	)
 }
 
+function LoginPage() {
+	return (
+		<main className="login">
+			<div className="login__card">
+				<h1 className="login__title">Sign In</h1>
+				<p className="login__note">Your correspondence awaits.</p>
+			</div>
+		</main>
+	)
+}
+
 function App() {
-	return <WelcomePage />
+	return (
+    <>
+      <Routes>
+        <Route path="/" element={<WelcomePage />} />
+        <Route path="/login" element={<LoginPage />} />
+      </Routes>
+    </>
+  );
 }
 
 export default App
