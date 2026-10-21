@@ -5,6 +5,7 @@ import heart from './assets/heart.png'
 import logo from './assets/FRUM.png'
 import spade from './assets/spade.png'
 import { Routes, Route, Link } from 'react-router';
+import { useState } from 'react'
 
 function WelcomePage() {
 	return (
@@ -46,15 +47,68 @@ function WelcomePage() {
 	)
 }
 
+
 function LoginPage() {
+    const [status, setStatus] = useState('empty');
+    const verifyLogin = async () => { console.log("login button clicked");
+        setStatus('loading');
+        console.log(JSON.stringify(document.getElementsByClassName("input__username.text")));
+//        try {
+//            fetch('https://localhost:5173/login', {
+//                 method: 'POST',
+//                 headers: {
+//                    'Content-Type': 'application/json'
+//                 },
+//                 body: JSON.stringify()
+//            })
+//        }
+
+    };
 	return (
 		<main className="login">
 			<div className="login__card">
-				<h1 className="login__title">Sign In</h1>
+				<h1 className="login__title">Log In</h1>
 				<p className="login__note">Your correspondence awaits.</p>
 			</div>
+            <div className="login__input">
+                {status === 'error' && (
+                    <p className="input__error">Invalid username or password.</p>
+                )}
+                {status === 'loading' && (
+                    <p className="input__loading">Please wait</p>
+                )}
+                <input className="input__username" type="text" placeholder="username"></input>
+                <input className="input__password" type="password" placeholder="password"></input>
+                <button className="input__login" onClick={verifyLogin}>Login</button>
+            </div>
+            <div className="login__signup">
+                <Link to="/signup" className="login__button">
+                    Sign Away Here
+                </Link>
+            </div>
 		</main>
 	)
+}
+
+function SignupPage() {
+    return (
+        <main className="signup">
+            <div className="signup__card">
+                <h1 className="signup__title">Sign away if you please</h1>
+                <p className="signup__note">Make your mark in the registry.</p>
+            </div>
+            <div className="signup__input">
+                <input className="input__username" type="text" placeholder="username"></input>
+                <input className="input__password" type="password" placeholder="password"></input>
+                <button className="input__signup">Sign Up</button>
+            </div>
+            <div className="signup__login">
+                <Link to="/login" className="signup__button">
+                    Already enrolled? Log In
+                </Link>
+            </div>
+        </main>
+    )
 }
 
 function App() {
@@ -63,6 +117,7 @@ function App() {
       <Routes>
         <Route path="/" element={<WelcomePage />} />
         <Route path="/login" element={<LoginPage />} />
+        <Route path="/signup" element={<SignupPage />} />
       </Routes>
     </>
   );

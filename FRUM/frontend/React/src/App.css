@@ -23,6 +23,8 @@
 	--oxblood: #5c1720;
 	--gold: #9a7a45;
 	--sepia: #9b876a;
+    --error: #7A1E16;
+    --error_bg: #F3D8D2;
 
 	--display: 'IM Fell English', 'Palatino Linotype', Palatino, Georgia, serif;
 	--body: Georgia, 'Times New Roman', serif;
@@ -245,14 +247,165 @@ body {
 	color: color-mix(in srgb, var(--paper), transparent 25%);
 }
 
+/* Correspondence form: shared by the login and signup plates. */
+.login__input,
+.signup__input {
+	display: grid;
+	gap: 1rem;
+	width: min(24rem, 100%);
+	margin: 2rem auto 0;
+}
+
+.input__username,
+.input__password {
+	width: 100%;
+	padding: 0.7rem 1rem;
+	font-family: var(--body);
+	font-size: 1rem;
+	color: var(--ink);
+	background-color: var(--paper);
+	border: 1px solid var(--charcoal);
+	box-shadow: inset 0 0 0 3px color-mix(in srgb, var(--sepia), transparent 72%);
+}
+
+.input__error {
+    width: 100%;
+    padding: 0.7rem 1rem;
+    font-family: var(--body);
+    color: var(--error); 
+    background: var(--error_bg);
+    border: 1px solid #B33A2B;
+
+}
+
+.input__username::placeholder,
+.input__password::placeholder {
+	color: color-mix(in srgb, var(--ink), transparent 48%);
+	font-style: italic;
+}
+
+.input__username:focus-visible,
+.input__password:focus-visible {
+	outline: 2px dashed var(--gold);
+	outline-offset: 3px;
+}
+
+/* Submit buttons: pressed in the same wax as the welcome seal. */
+.input__login,
+.input__signup {
+	padding: 0.7rem 1rem;
+	font-family: var(--display);
+	font-size: 1.05rem;
+	letter-spacing: 0.08em;
+	color: var(--paper);
+	background-color: var(--oxblood);
+	border: 1px solid var(--gold);
+	box-shadow:
+		0 0 0 3px color-mix(in srgb, var(--gold), transparent 45%),
+		inset 0 0 0 2px color-mix(in srgb, var(--crimson), transparent 35%);
+	cursor: pointer;
+	transition:
+		background-color 160ms ease,
+		transform 160ms ease;
+}
+
+.input__login:hover,
+.input__login:focus-visible,
+.input__signup:hover,
+.input__signup:focus-visible {
+	background-color: var(--crimson);
+	transform: translateY(-1px);
+}
+
+.input__login:active,
+.input__signup:active {
+	transform: translateY(0);
+}
+
+.input__login:focus-visible,
+.input__signup:focus-visible {
+	outline: 2px dashed var(--gold);
+	outline-offset: 4px;
+}
+
+/* Secondary links that switch between the two plates. */
+.login__signup,
+.signup__login {
+	margin: 1.5rem 0 0;
+}
+
+.login__button,
+.signup__button {
+	font-family: var(--display);
+	font-style: italic;
+	font-size: 1rem;
+	letter-spacing: 0.04em;
+	color: var(--paper);
+	text-decoration: underline;
+	text-decoration-color: color-mix(in srgb, var(--gold), transparent 30%);
+	text-underline-offset: 4px;
+	transition: color 160ms ease;
+}
+
+.login__button:hover,
+.login__button:focus-visible,
+.signup__button:hover,
+.signup__button:focus-visible {
+	color: var(--gold);
+}
+
+/* Signup plate mirrors the login plate. */
+.signup {
+	min-height: 100svh;
+	display: grid;
+	place-items: center;
+	padding: 2rem;
+	background-color: var(--oxblood);
+	color: var(--paper);
+	text-align: center;
+}
+
+.signup__card {
+	max-width: 30rem;
+    line-height: 0.75;
+}
+
+.signup__title {
+	margin: 0;
+	font-family: var(--display);
+	font-weight: 400;
+	font-size: clamp(2rem, 6vw, 3rem);
+	letter-spacing: 0.14em;
+	color: var(--paper);
+}
+
+.signup__note {
+	margin: 0.75rem 0 0;
+	font-family: var(--display);
+	font-style: italic;
+	font-size: clamp(1rem, 2.4vw, 1.25rem);
+	color: color-mix(in srgb, var(--paper), transparent 25%);
+}
+
+
 @media (prefers-reduced-motion: reduce) {
-	.plate__button {
+	.plate__button,
+	.input__login,
+	.input__signup,
+	.login__button,
+	.signup__button {
 		transition: none;
 	}
 
 	.plate__button:hover,
 	.plate__button:focus-visible,
-	.plate__button:active {
+	.plate__button:active,
+	.input__login:hover,
+	.input__login:focus-visible,
+	.input__login:active,
+	.input__signup:hover,
+	.input__signup:focus-visible,
+	.input__signup:active {
 		transform: none;
 	}
 }
