@@ -50,9 +50,8 @@ function WelcomePage() {
 
 function LoginPage() {
     const [status, setStatus] = useState('empty');
-    const verifyLogin = async () => { console.log("login button clicked");
+    const verifyLogin = async () => { 
         setStatus('loading');
-        console.log(JSON.stringify(document.getElementsByClassName("input__username.text")));
 //        try {
 //            fetch('https://localhost:5173/login', {
 //                 method: 'POST',
@@ -91,6 +90,10 @@ function LoginPage() {
 }
 
 function SignupPage() {
+    const [status, setStatus] = useState('empty');
+    const temp = async () => {
+
+    };
     return (
         <main className="signup">
             <div className="signup__card">
@@ -98,9 +101,15 @@ function SignupPage() {
                 <p className="signup__note">Make your mark in the registry.</p>
             </div>
             <div className="signup__input">
+                {status === 'error' && (
+                    <p className="input__error">Invalid username or password.</p>
+                )}
+                {status === 'loading' && (
+                    <p className="input__loading">Please wait</p>
+                )}
                 <input className="input__username" type="text" placeholder="username"></input>
                 <input className="input__password" type="password" placeholder="password"></input>
-                <button className="input__signup">Sign Up</button>
+                <button className="input__signup" onClick={temp}>Sign Up</button>
             </div>
             <div className="signup__login">
                 <Link to="/login" className="signup__button">
