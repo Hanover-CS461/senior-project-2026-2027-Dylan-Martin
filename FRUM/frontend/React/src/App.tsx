@@ -91,8 +91,24 @@ function LoginPage() {
 
 function SignupPage() {
     const [status, setStatus] = useState('empty');
-    const temp = async () => {
-
+    const [username, setUsername] = useState('');
+    const [password, setPassword] = useState('');
+    const handleSignup = async () => {
+        setStatus('loading')
+        try {
+            const res = await fetch('/api/signup', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ username, password }),
+            });
+            setStatus(res.ok ? 'success' : 'error');
+            if (status === 'error') {
+                console.error('request error: ', error.message);
+            }
+        } catch (error) {
+            console.error('network error: ', error.message);
+            setStatus('error');   // only for network failure / server down
+        }
     };
     return (
         <main className="signup">
@@ -107,9 +123,24 @@ function SignupPage() {
                 {status === 'loading' && (
                     <p className="input__loading">Please wait</p>
                 )}
-                <input className="input__username" type="text" placeholder="username"></input>
-                <input className="input__password" type="password" placeholder="password"></input>
-                <button className="input__signup" onClick={temp}>Sign Up</button>
+                {status === 'success' && (
+                    <p className="input__success">Very nice</p>
+                )}
+                <input 
+                className="input__username"
+                type="text"
+                placeholder="username" 
+                value={username}
+                onChange={e => setUsername(e.target.value)}
+                />
+                <input
+                className="input__password"
+                type="password"
+                placeholder="password" 
+                value={password}
+                onChange={e => setPassword(e.target.value)}
+                />
+                <button className="input__signup" onClick={handleSignup}>Sign Up</button>
             </div>
             <div className="signup__login">
                 <Link to="/login" className="signup__button">
