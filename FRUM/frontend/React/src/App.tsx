@@ -93,20 +93,25 @@ function SignupPage() {
     const [status, setStatus] = useState('empty');
     const [username, setUsername] = useState('');
     const [password, setPassword] = useState('');
+    const [errorMessage, setErrorMessage] = useState('');
     const handleSignup = async () => {
-        setStatus('loading')
+        setStatus('loading');
+        setErrorMessage('');
         try {
             const res = await fetch('/api/signup', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ username, password }),
             });
-            setStatus(res.ok ? 'success' : 'error');
-            if (status === 'error') {
-                console.error('request error: ', error.message);
+            if (!res.ok) {
+                setStatus('error');
+                const errorData = await res.json();
+                setErrorMessage(errorData.message);
+            } else {
+                setStatus('success');
             }
         } catch (error) {
-            console.error('network error: ', error.message);
+            console.error('network error: ', error);
             setStatus('error');   // only for network failure / server down
         }
     };
@@ -118,7 +123,7 @@ function SignupPage() {
             </div>
             <div className="signup__input">
                 {status === 'error' && (
-                    <p className="input__error">Invalid username or password.</p>
+                    <p className="error">{errorMessage}</p>
                 )}
                 {status === 'loading' && (
                     <p className="input__loading">Please wait</p>
