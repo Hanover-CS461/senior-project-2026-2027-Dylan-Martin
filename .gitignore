@@ -5,3 +5,8 @@ docs/notes.txt
 .secrets
 .env.local
 .env.production
+
+# environment tings
+.env
+.env.*
+!.env.example

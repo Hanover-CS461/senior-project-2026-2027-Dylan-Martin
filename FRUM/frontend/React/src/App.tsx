@@ -106,7 +106,7 @@ function SignupPage() {
             if (!res.ok) {
                 setStatus('error');
                 const errorData = await res.json();
-                setErrorMessage(errorData.message);
+                setErrorMessage(errorData["error"]);
             } else {
                 setStatus('success');
             }
@@ -123,7 +123,7 @@ function SignupPage() {
             </div>
             <div className="signup__input">
                 {status === 'error' && (
-                    <p className="error">{errorMessage}</p>
+                    <p className="input__error">{errorMessage}</p>
                 )}
                 {status === 'loading' && (
                     <p className="input__loading">Please wait</p>
