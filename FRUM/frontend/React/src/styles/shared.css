@@ -1,0 +1,61 @@
+@font-face {
+	font-family: 'IM Fell English';
+	src: url('../assets/fonts/IMFellEnglish-Regular.woff2') format('woff2');
+	font-style: normal;
+	font-weight: 400;
+	font-display: swap;
+}
+
+@font-face {
+	font-family: 'IM Fell English';
+	src: url('../assets/fonts/IMFellEnglish-Italic.woff2') format('woff2');
+	font-style: italic;
+	font-weight: 400;
+	font-display: swap;
+}
+
+:root {
+	--ivory: #ede2c6;
+	--paper: #f7f0dd;
+	--ink: #1e1b18;
+	--charcoal: #3a342e;
+	--crimson: #8f1d2c;
+	--oxblood: #5c1720;
+	--gold: #9a7a45;
+	--sepia: #9b876a;
+	--error: #7A1E16;
+	--error_bg: #F3D8D2;
+
+	--display: 'IM Fell English', 'Palatino Linotype', Palatino, Georgia, serif;
+	--body: Georgia, 'Times New Roman', serif;
+
+	/* Panel tone: aged parchment, a touch warmer/darker than the ivory page. */
+	--parchment: color-mix(in srgb, var(--ivory), var(--sepia) 18%);
+
+	color-scheme: light;
+}
+
+*,
+*::before,
+*::after {
+	box-sizing: border-box;
+}
+
+/* Neutralize Vite's default #root styling from index.css */
+#root {
+	width: 100%;
+	border-inline: none;
+	min-height: 100svh;
+	display: block;
+}
+
+html {
+	background-color: var(--ivory);
+}
+
+body {
+	margin: 0;
+	background-color: var(--ivory);
+	color: var(--ink);
+	font-family: var(--body);
+}
