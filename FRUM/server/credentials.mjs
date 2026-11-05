@@ -1,15 +1,8 @@
-import dotenv from 'dotenv';
-import { MongoClient } from "mongodb";
 import express from 'express';
-import { hash, verify } from 'argon2';
-dotenv.config();
+import { hash } from 'argon2';
+import { connect, createUser } from './database.mjs';
 
-const uri = process.env.MONGODB_URI;
-const client = new MongoClient(uri);
-
-//const passwordHash = await hash("password");
-//const ok = await verify (passwordHash, "password");
-//console.log(ok);
+await connect();
 
 const app = express();
 app.use(express.json());
@@ -29,15 +22,11 @@ function isPasswordEmpty(password) {
 	else { return false }
 }
 
-async function createUser(username, passwordHash, publicKey) {
-	return;
-}
-
 function hashPassword(password) {
-
+	return hash(password);
 }
 
-app.post('/api/signup', (req, res) => {
+app.post('/api/signup', async (req, res) => {
     if (!isJSON(req.body)) {
         return res.status(400).json({ error: "Expected JSON body" });
     }
@@ -46,6 +35,8 @@ app.post('/api/signup', (req, res) => {
     if (isUsernameEmpty(username) || isPasswordEmpty(password)){
         return res.status(402).json({ error: "Fields can not be empty" });
     }
+    const passwordHash = await hashPassword(password);
+    await createUser(username, passwordHash, req.body.publicKey);
     res.sendStatus(201);
 })
 
