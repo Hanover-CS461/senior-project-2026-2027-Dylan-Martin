@@ -1,8 +1,9 @@
 import express from 'express';
 import { hash } from 'argon2';
-import { connect, createUser } from './database.mjs';
+import { connect, createUser, createUserCollection, close } from './database.mjs';
 
 await connect();
+await createUserCollection();
 
 const app = express();
 app.use(express.json());
