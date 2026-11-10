@@ -57,3 +57,11 @@ export async function removeUser(username) {
     const result = await Users.deleteOne({ username: username });
     return result.acknowledged;
 }
+
+export async function udpateKeyData(username, key, fingerprint) {
+    const result = await db.collection("users").updateOne(
+        { username: "someUser" },
+        { $set: { key: "yourKeyHere", fingerprint: "yourFingerprintHere" } }
+    );
+    return result
+}
