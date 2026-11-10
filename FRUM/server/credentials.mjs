@@ -36,8 +36,9 @@ app.post('/api/signup', async (req, res) => {
     if (isUsernameEmpty(username) || isPasswordEmpty(password)){
         return res.status(402).json({ error: "Fields can not be empty" });
     }
-    const passwordHash = await hashPassword(password);
-    await createUser(username, passwordHash, req.body.publicKey);
+    
+    // Check username is not taken
+    
     res.sendStatus(201);
 })
 

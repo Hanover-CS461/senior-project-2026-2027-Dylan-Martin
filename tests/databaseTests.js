@@ -1,5 +1,5 @@
-import { connect, close, listUsernames } from "../FRUM/server/database.mjs";
+import { connect, close, createUser } from "../FRUM/server/database.mjs";
 
 await connect();
-await listUsernames();
-await close();
+await createUser("Alice", null, null);
+// await close();
