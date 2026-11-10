@@ -36,9 +36,13 @@ app.post('/api/signup', async (req, res) => {
     if (isUsernameEmpty(username) || isPasswordEmpty(password)){
         return res.status(402).json({ error: "Fields can not be empty" });
     }
+
+    const hashedPassword = hash(password);
     
     // Check username is not taken
-    
+    if (createUser(username, hashedPassword, null, null) === 11000) { res.status(409).json({ error: "Username already exists" }); } 
+
+
     res.sendStatus(201);
 })
 

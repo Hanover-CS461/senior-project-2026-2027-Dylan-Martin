@@ -1,5 +1,5 @@
-import { connect, close, createUser } from "../FRUM/server/database.mjs";
+import { connect, close, removeUser } from "../FRUM/server/database.mjs";
 
 await connect();
-await createUser("Alice", null, null);
-// await close();
+console.log(await removeUser("Alice"));
+await close();

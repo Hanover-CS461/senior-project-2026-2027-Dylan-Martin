@@ -4,12 +4,12 @@ dotenv.config({ path: new URL('./.env', import.meta.url) });
 
 const client = new MongoClient(process.env.MONGODB_URI);
 let db;
-let collections = null;
+let Users;
 
 export async function connect() {
     await client.connect();
     db = client.db('frum');
-    collections = await db.listCollections().toArray();
+    Users = await db.collection("Users");
     console.log('connected');
 }
 
@@ -20,8 +20,7 @@ export async function close() {
 }
 
 export async function UsersExists() {
-    const collectionName = collections[0]["name"];
-    if (collectionName === "Users") { return true; }
+    if (Users === "Users") { return true; }
     else { return false; }
 }
 
@@ -33,10 +32,28 @@ export async function createUserCollection() {
 
 export async function findUserByUsername(username) {
     // TODO: return the user document matching username, or null
-    return await collections[0][username];
+    return await Users[username];
 }
 
-export async function createUser(username, passwordHash, publicKey) {
+// Database indexes should be username, passwordHash, publicKey, and keyFingerprint
+export async function createUser(username, passwordHash, publicKey, keyFingerprint) {
     // TODO: insert a new user document and return the result
-    console.log(findUserByUsername(username));
+    const doc = {
+        username: username,
+        passwordHash: passwordHash,
+        publicKey: publicKey,
+        keyFingerprint: keyFingerprint
+    };
+    try {
+        const result = await Users.insertOne(doc);
+        return result.acknowledged;
+    }
+    catch (error) {
+        return error.code;
+    }
+}
+
+export async function removeUser(username) {
+    const result = await Users.deleteOne({ username: username });
+    return result.acknowledged;
 }
