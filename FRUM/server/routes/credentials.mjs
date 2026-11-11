@@ -1,11 +1,10 @@
 import { Router } from 'express';
-import { hash } from 'argon2';
-import { createUser, udpateKeyData } from '../database.mjs';
+import { hash, verify } from 'argon2';
+import { createUser, udpateKeyData, getUserHashedPassword, getPublicKey } from '../database.mjs';
 import { webcrypto } from 'crypto';
 import { type } from 'os';
 
 const router = Router();
-const subtle = webcrypto;
 
 router.post('/signup', async (req, res) => {
     const username = req.body.username;
@@ -32,11 +31,10 @@ router.post('/signup', async (req, res) => {
 
         return res.sendStatus(201);
     } catch (error) {
-        console.error(error)
+        console.error(error);
         return res.status(500).json({ error: "Failed to create user" });
     }
 });
-
 
 async function generateKeys() {
     return await webcrypto.subtle.generateKey(
@@ -48,19 +46,18 @@ async function generateKeys() {
         ['deriveKey', 'deriveBits']
     );
 }
-
 async function fingerprintPublicKey(p) {
-    const publicRaw = webcrypto.subtle.exportKey(
+    const publicRaw = await webcrypto.subtle.exportKey(
         "raw",
         p
     )
     return webcrypto.subtle.digest('SHA-256', publicRaw);
 }
 
-async function exportPublicKey(keys) {
+async function exportPublicKey(p) {
     return await webcrypto.subtle.exportKey(
         "jwk",
-        keys.publicKey
+        p
     );
 }
 
@@ -77,11 +74,36 @@ router.post('/login', async (req, res) => {
             error: "Username and password are required"
         });
     }
-    const keyPair = await generateKeys();
-    const fingerprintKey = await fingerprintPublicKey(keyPair.publicKey);
-    const exportPublic = await exportPublicKey(keyPair.publicKey);
 
-    // const result = await udpateKeyData(username, exportPublic, fingerprintKey);
+
+    try {
+        const userHashedPasswordField =  await getUserHashedPassword(username)
+        const isMatch = await verify(userHashedPasswordField.passwordHash, password);
+
+        if (!isMatch) {
+            return res.status(401).json({ error: "Incorrect password" });
+        }
+
+        const currKeyField = await getPublicKey(username);
+
+        // First time login needs keys
+        if (currKeyField.publicKey === null) {
+            const keyPair = await generateKeys();
+            const fingerprintKey = await fingerprintPublicKey(keyPair.publicKey);
+            const exportPublic = await exportPublicKey(keyPair.publicKey);
+
+            const result = await udpateKeyData(username, exportPublic, fingerprintKey);
+            if (result.modifiedCount === 0 ) {
+                return res.status(401).json({ error: "Account does not exist" });
+            }
+            return res.sendStatus(200);
+        }
+        // Not first time login
+        return res.sendStatus(200);
+    } catch (error) {
+        console.error(error);
+        return res.status(500).json({ error: "Failed to login user" });
+    }
 
 });
 

@@ -30,11 +30,6 @@ export async function createUserCollection() {
     console.log("Created Users Collection")
 }
 
-export async function findUserByUsername(username) {
-    // TODO: return the user document matching username, or null
-    return await Users[username];
-}
-
 // Database indexes should be username, passwordHash, publicKey, and keyFingerprint
 export async function createUser(username, passwordHash, publicKey, keyFingerprint) {
     // TODO: insert a new user document and return the result
@@ -59,9 +54,25 @@ export async function removeUser(username) {
 }
 
 export async function udpateKeyData(username, key, fingerprint) {
-    const result = await db.collection("users").updateOne(
-        { username: "someUser" },
-        { $set: { key: "yourKeyHere", fingerprint: "yourFingerprintHere" } }
-    );
-    return result
+    try{
+        const result = await Users.updateOne(
+            { username: username },
+            { $set: { publicKey: key, keyFingerprint: fingerprint } }
+        );
+        return result;
+    } catch (error) {
+        return error.code
+    }
+    
+
+}
+
+export async function getUserHashedPassword(username) {
+    const hashedPasswordField = await Users.findOne({ username: username }, { projection: { passwordHash: 1, _id: 0 } });
+    return hashedPasswordField;
+}
+
+export async function getPublicKey(username) {
+    const keyField = await Users.findOne({ username: username }, { projection: { publicKey: 1, _id: 0 } });
+    return keyField;
 }
