@@ -1,3 +1,4 @@
+import { getRandomValues } from 'node:crypto';
 import {
 	storePrivateKey,
 	getPrivateKey,
@@ -81,17 +82,63 @@ export async function publishPublicKey(username, identity) {
 	}
 }
 
+const HKDF_SALT = new TextEncoder().encode('frum-v1');
+
 export async function deriveSharedKey(privateKey, peerPublicKey) {
-	// TODO: ECDH deriveBits plus HKDF-SHA-256 into an AES-GCM key (NIST SP 800-56A).
-	throw new Error('deriveSharedKey not implemented');
+    const sharedSecret = await subtle.deriveBits(
+    {
+        name: "ECDH",
+        public: peerPublicKey
+    },
+    privateKey,
+    256);
+
+    const hkdfKey = await subtle.importKey(
+        'raw',
+        sharedSecret,
+        'HKDF',
+        false,
+        ['deriveKey']
+    )
+
+    return await subtle.deriveKey(
+    {
+        name: "HKDF",
+        hash: "SHA-256",
+        salt: HKDF_SALT,
+        info: new TextEncoder().encode("derived key")
+    },
+    hkdfKey,
+    {
+        name: "AES-GCM",
+        length: 256
+    },
+    false,
+    ['encrypt', 'decrypt']);
 }
 
 export async function encryptMessage(sharedKey, plaintext) {
 	// TODO: AES-GCM encrypt with a fresh 96-bit IV; return { iv, ciphertext }.
-	throw new Error('encryptMessage not implemented');
+    const IV = crypto.getRandomValues(new Uint8Array(12));
+	const encryptedMessage = await subtle.encrypt(
+        {
+            name: "AES-GCM",
+            iv: IV
+        },
+        sharedKey,
+        new TextEncoder().encode(plaintext)
+    );
+    return { iv: IV, ciphertext: encryptedMessage };
 }
 
 export async function decryptMessage(sharedKey, payload) {
 	// TODO: AES-GCM decrypt payload.iv and payload.ciphertext back into a string.
-	throw new Error('decryptMessage not implemented');
+	return await subtle.decrypt(
+        {
+            name: "AES-GCM",
+            iv: new Uint8Array(payload.iv)
+        },
+        sharedKey,
+        new TextDecoder().decode(payload.ciphertext)
+    );
 }
