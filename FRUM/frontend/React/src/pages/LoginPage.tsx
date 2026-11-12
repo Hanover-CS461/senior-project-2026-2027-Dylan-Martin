@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import { Link } from 'react-router'
+import { initializeIdentity, publishPublicKey } from '../../../src/crypto/keys.mjs'
 import '../styles/auth.css'
 
 function LoginPage() {
@@ -21,6 +22,11 @@ function LoginPage() {
 				const errorData = await res.json()
 				setErrorMessage(errorData['error'])
 			} else {
+				const data = await res.json()
+				if (data.needsPublicKey) {
+					const identity = await initializeIdentity()
+					await publishPublicKey(data.username, identity)
+				}
 				setStatus('success')
 			}
 		} catch (error) {

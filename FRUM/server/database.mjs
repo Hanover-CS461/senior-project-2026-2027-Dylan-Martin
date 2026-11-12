@@ -9,7 +9,7 @@ let Users;
 export async function connect() {
     await client.connect();
     db = client.db('frum');
-    Users = await db.collection("Users");
+    Users = db.collection("Users");
     console.log('connected');
 }
 
@@ -20,18 +20,20 @@ export async function close() {
 }
 
 export async function UsersExists() {
-    if (Users === "Users") { return true; }
-    else { return false; }
+    const collections = await db.listCollections({ name: "Users" }).toArray();
+    return collections.length > 0;
 }
 
 export async function createUserCollection() {
-    if (UsersExists) { return; }
-    await db.createCollection(Users, {});
-    console.log("Created Users Collection")
+    if (!(await UsersExists())) {
+        await db.createCollection("Users");
+        console.log("Created Users Collection");
+    }
+    await Users.createIndex({ username: 1 }, { unique: true });
 }
 
 // Database indexes should be username, passwordHash, publicKey, and keyFingerprint
-export async function createUser(username, passwordHash, publicKey, keyFingerprint) {
+export async function createUser(username, passwordHash, publicKey = null, keyFingerprint = null) {
     // TODO: insert a new user document and return the result
     const doc = {
         username: username,

@@ -5,6 +5,10 @@ import { defineConfig } from 'vite'
 export default defineConfig({
   plugins: [react()],
   server: {
+    fs: {
+      // Allow importing the shared browser-side crypto/storage code from ../src
+      allow: ['..'],
+    },
     proxy: {
       // Forward /api requests to the backend
       '/api': {

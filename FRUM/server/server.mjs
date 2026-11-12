@@ -18,7 +18,7 @@ startServer();
 
 async function startServer() {
     await connect();
-    createUserCollection();
+    await createUserCollection();
 
     const server = app.listen(3000, () => {
         console.log("server runnin on port 3000");
