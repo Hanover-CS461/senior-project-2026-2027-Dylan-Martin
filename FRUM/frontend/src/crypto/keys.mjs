@@ -1,9 +1,10 @@
-import { getRandomValues } from 'node:crypto';
 import {
 	storePrivateKey,
 	getPrivateKey,
 	storeIdentity,
 	getIdentity,
+	getPinnedPeerKey,
+	storePinnedPeerKey,
 } from '../storage/indexDatabase.mjs';
 
 const subtle = globalThis.crypto.subtle;
@@ -133,12 +134,48 @@ export async function encryptMessage(sharedKey, plaintext) {
 
 export async function decryptMessage(sharedKey, payload) {
 	// TODO: AES-GCM decrypt payload.iv and payload.ciphertext back into a string.
-	return await subtle.decrypt(
+	const arrayDecrypt = await subtle.decrypt(
         {
             name: "AES-GCM",
             iv: new Uint8Array(payload.iv)
         },
         sharedKey,
-        new TextDecoder().decode(payload.ciphertext)
+        payload.ciphertext
     );
+	return new TextDecoder().decode(arrayDecrypt);
+}
+
+export async function fetchPeerKey(username) {
+	const response = await fetch(`/api/keys/${encodeURIComponent(username)}`);
+
+
+	if (!response.ok) {
+		const error = await response.json();
+		throw new Error(error.error ?? 'Failed to retrieve  public key');
+	}
+
+	const pKey = await response.json();
+
+	const importedKey = await importPublicKey(pKey);
+
+	return importedKey;
+}
+
+export async function getConversationKey(username) {
+	const peerPublicKey = await fetchPeerKey(username)
+	const fingerprint = await fingerprintPublicKey(peerPublicKey)
+
+	const pinned = await getPinnedPeerKey(username)
+	if (!pinned) {
+		await storePinnedPeerKey(username, await exportPublicKey(peerPublicKey), fingerprint)
+	} else if (pinned.fingerprint !== fingerprint) {
+		throw new Error(`Key fingerprint changed for ${username}`)
+	}
+
+	const privateKey = await getPrivateKey()
+	if (!privateKey) {
+		throw new Error('No local identity; run initializeIdentity first')
+	}
+
+	return deriveSharedKey(privateKey, peerPublicKey)
 }

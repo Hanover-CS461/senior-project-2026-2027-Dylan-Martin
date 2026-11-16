@@ -112,4 +112,23 @@ router.post('/keys', async (req, res) => {
     }
 });
 
+router.get('/keys/:username', async (req, res) => {
+    const username = req.params.username;
+
+
+    try {
+        const result = await getPublicKey(username);
+
+        if (!result || !result.publicKey) {
+            return res.status(404).json({ error: "Account does not exist" });
+        }
+
+        return res.status(200).json( result.publicKey);
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ error: "Failed to retrieve public key" });
+    }
+});
+
+
 export default router;
