@@ -123,7 +123,7 @@ router.get('/keys/:username', async (req, res) => {
             return res.status(404).json({ error: "Account does not exist" });
         }
 
-        return res.status(200).json( result.publicKey);
+        return res.status(200).json( result.publicKey );
     } catch (error) {
         console.error(error);
         res.status(500).json({ error: "Failed to retrieve public key" });

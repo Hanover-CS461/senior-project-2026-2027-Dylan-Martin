@@ -1,0 +1,127 @@
+database = mongodb
+index = indexeddb
+frum-mongo database = podman container of MongoDB
+
+BACKEND
+credentials API
+'api/signup':
+    Purpose: The purpose of this api call is to create the user account. This hashes the password and stores the unique username as well as the hashed password to the mongodb database. It does not handle key generation, public key publications, or fingerprinting public key. This functions uses the createUser database function.
+    Parameters: request param should hold the typed username as well as the typed password.
+    Returns: error status when the try catches an error. These include account existing, password and username required, databse errors, and network errors. returns status 201 when account successfully created.
+
+'api/login':
+    Purpose: The purpose this call is to verify the hashed password with the stored one. Which uses getUserHashedPassword database function and the built in argon verify function. This call also needs to verify if the user has logged in before and has generated a key pair yet. Using the databse function getPublicKey. If it does not find one or returns null then we set a bool variable to be true. This will tell the frontend that we need to call generateKeyPairs that is located in frontend/src/crypto/keys.mjs.
+    Parameters: request param should hold typed username and typed password
+    Returns: error status when the try catches an error. These include account does not exist, password and username required, incorrect password, database errors, and network errors. When successfully logged in and keys checked it should return a status code of 200 and return a json body containing the username and the bool variable to allow browser to generate key pairs for proper user.
+
+'api/keys':
+    Purpose: The purpose of this call is to update key data in mongoDB. Specifically public key and the keyFingerprint. This will use the function updateKeyDatabase provided in the database file. 
+    Parameters: requeust param should hold username of user to update. As well as the public key and the public key fingerprint 
+    Returns: error status when the try catches errors. These include public key fingerprint and username required, account does not exist to update keys, and database errors. When successfully updated return status 200.
+
+'api/keys/:username':
+    Purpose: Purpose of this call is to retrieve the public key from the specified username using the getPublicKey function provided in the database file. 
+    Parameters: username of user account to retrieve public key. 
+    Returns: error when the try catches an error. These include account not found and database errors. On success returns status 200 and a json body including the users public key.
+
+Databse functions
+To start required nodes and use cases:
+1. dotenv to read mongodDB URI to access frum-mongo database.
+2. Mongoclient to connect, modify, and query the frum-mongo database.
+'connect':
+    Purpose: The purpose of this function is to connect to the database to allow for modification and querying of the frum-mongo DB. Logs that it is connected. 
+    Parameters: No parameters although it does set some global variables that i will discuss here. const client is the Mongoclient connection to the databse with the verified mongoDB URI. db is the variable that holds the actual database given by Mongoclient. Users variable is the collection that sits in db (frm-mongo) and holds user documents. 
+    Returns: No returns only console.log of connection success.
+
+'close':
+    Purpose: purpose of this function is to properly shut down the connection to frum-mongo
+    Parameters: Takes no parameters
+    Returns: No returns only console.log of disconnection.
+
+'UsersExists'
+    Purpose: purpose of this function is to return a bool of whether the Users collection has been created in frum-mongo. Uses Mongoclient built in DB function to return list of collections that is then toArray(). Checks length of that Array and if it is 0 return false else return true
+    Parameters: No parameters
+    Returns: Checks length of Array and if it is 0 return false else return true
+
+'createUserCollection'
+    Purpose: This function creates the User collection in frum-mongo if it does not exist. Uses UsersExists helper function. Creates it if it needs to be created and always adds an index using a built in Mongoclient function so that usernames are unique and we do not have different users with same username (fail-safe operation)
+    Parameters: No parameters
+    Returns: no return 
+
+'createUser'
+    Purpose: function creates a user document and inserts into the Users collections. It uses built in Mongoclient function insertOne.
+    Parameters: username which a string for the users account name, passwordHash which i believe is an argon tag of size T bytes (argon2 docs needed), publicKey which defaults to null it is a cryptoKey object, fingerprintKey a SHA-256 digest also defualts to null.
+    Returns: The result of the return of insertOne specifically the acknowledgement. Returns error code if the try catches an error. Specifically error 11000 for account already exists simplified.
+
+'removeUser' (deprecated for now not gonna allow account deletion in demo)
+    Purpose: Remove a user account using the accounts username. Uses built in Mongoclient function deleteOne
+    Parameters: username a string of user accounts username
+    Returns: return the acknowledgement of the deleteOne function
+
+'updateKeyData'
+    Purpose: Update the users MongoDB exisiting doc with their public key after generation and a digest of that public key for later verification. Uses built in updateOne Mongoclient function. 
+    Parameters: username string of user account, key a cryptoKey object, and fingerprintKey a digest of the public key. 
+    Returns: error when the try catches and error and returns an error code similar to account existing however it is account does not exist. On success return the result of the updateOne function. 
+
+'getUserHashedPassword'
+    Purpose: Query the database and return the usernames hashedpassword field for verifcation during login. 
+    Parameters: username a string of users account name
+    Returns: the hashedPassword field of usernames doc
+
+'getPublicKey'
+    Purpose: Query the database and return the usernames stored public key for shared secret and fingerprinting.
+    Paramters: username a string of users account name
+    Returns: the public key cryptoKey object from usernames publicKey field. 
+
+Server
+Things to know: Runs database functions and listens on port for api calls in one file a separation of files.
+'startServer'
+    Purpose: start the Mongoclient and create user collection if needed. Then listen on port 3000 for api calls. 
+    Parameters: no parameters
+    Returns: console.log that it is listening on port 3000
+
+'shutdown'
+    Purpose: properly close mongodb connection and stop listening on port 3000
+    Parameters: no parameters
+    Returns: no returns console logs for errors and that it is shutting down.
+
+FRONTEND
+Crypot Keys ('FRUM/frontend/src/crypto')
+I am going to skip all of the crypto api functions as i made a tutorial for them if i make this a md on my github pages it will link to the tutorial.
+'initializeIdentity'
+    Purpose: Check if account has an exisiting identity which is comrpised of the public key and the key fingerprint stored in index. Also check if the account has a private key uploaded in index as well. If it does then just return the existing identity (public and fingerprint). If it does not have either a private key or an exisitng identity then we must create keypairs using generatekeys function. After prepare the public key for exporting to index as well as the fingerprint. Store the private key using indexDatabase function storePrivateKey. Then store the identity using storeIdentity return the pair of public key and fingerprint 
+    Parameters: no parameters all is pulled from indexedDB
+    Returns: if exisiting identity is true then just return that identity if not return new public key and fingerprint.
+
+'publishPublicKey'
+    Purpose: Send a post request to our keys api to store the public key in the mongoDB user account for other users to pull and verify and start a conversation.
+    Parameters: username a string of the users account name and identity which is the users accounts publicKey and fingerprintKey to store into mongoDB.
+    Returns: no success returns api handles that will throw error if it was not successful. await api response and throw new error.
+
+'fetchPeerKey'
+    Purpose: Asks api to query database for stored public key of the user we would like to chat with. Import the public key for crypto use as well as fingerprint checking and verification.
+    Parameters: username a string of the users account that we would like to chat with.
+    Returns: the imported public key cryptoKey object.
+
+'getSharedKey'
+    Purpose: derive the shared secret then shared key between the two users that are wanting to chat. Uses fetchPeerKey and getPinnedPeerKey if there is not a pinned key yet between user and who they are communicated with then we must pin the key and fingerprint. Each time they want to reconnect and talk again that pinned key is then verified (TOFU).
+    Parameters: username of the peer we would like to chat with.
+    Returns: throws new error when initializeIdentity is not ran and there is not user public key. also throws a new error when the pinned fingerprint is changed. returns shared symmetric key for encrypt and decrypt.
+
+IndexedDB ('FRUM/frontend/src/storage')
+The index will hold three objectStores these will be named keys, peers, and messages. Each will hold their own records. To be explained during function descriptions
+
+'openKeyDatabase'
+    Purpose: This opens and creates the IndexedDB that lives on the browser. After creating it the function checks to see if the objectStores are created. If not creates them. 
+    Parameters: No parameters
+    Returns: A promise that resolves on success to the request result of opening the DB and rejects on error and returns the request result of opening the DB.
+
+'requestAsPromise'
+    Purpose: this funciton takes indexedDB queries and updates and returns them as promises which resolve or reject which is important for asynchronous executions. 
+    Parameters: requests is the index function that is being executed and want as a promise
+    Returns: A promise that resolves on success of the index request and returns the result. Rejects on error and returns index request and returns the error.
+
+'getItem'
+    Purpose: open the key index and start a transaction that queries the index and gives a read only DOM object of the storeName and the item you want
+    Parameters: storeName is the objectStoreName you want to pull a record from. Key is a string that is the record that you want to get
+    Returns: 

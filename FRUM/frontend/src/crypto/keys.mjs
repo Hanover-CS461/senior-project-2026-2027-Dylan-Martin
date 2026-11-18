@@ -15,7 +15,7 @@ export async function generateKeys() {
 			name: 'ECDH',
 			namedCurve: 'P-256',
 		},
-		true,
+		false,
 		['deriveKey', 'deriveBits']
 	);
 }
@@ -139,7 +139,7 @@ export async function decryptMessage(sharedKey, payload) {
             name: "AES-GCM",
             iv: new Uint8Array(payload.iv)
         },
-        sharedKey,
+        sharedKey,getConversationKey,
         payload.ciphertext
     );
 	return new TextDecoder().decode(arrayDecrypt);
@@ -161,21 +161,24 @@ export async function fetchPeerKey(username) {
 	return importedKey;
 }
 
-export async function getConversationKey(username) {
-	const peerPublicKey = await fetchPeerKey(username)
-	const fingerprint = await fingerprintPublicKey(peerPublicKey)
-
-	const pinned = await getPinnedPeerKey(username)
-	if (!pinned) {
-		await storePinnedPeerKey(username, await exportPublicKey(peerPublicKey), fingerprint)
-	} else if (pinned.fingerprint !== fingerprint) {
-		throw new Error(`Key fingerprint changed for ${username}`)
-	}
-
+export async function getSharedKey(username) {
 	const privateKey = await getPrivateKey()
 	if (!privateKey) {
 		throw new Error('No local identity; run initializeIdentity first')
 	}
+	const peerPublicKey = await fetchPeerKey(username)
+	const fingerprint = await fingerprintPublicKey(peerPublicKey)
 
-	return deriveSharedKey(privateKey, peerPublicKey)
+	const pinned = await getPinnedPeerKey(username)
+	if (pinned && pinned.fingerprint !== fingerprint) {
+		throw new Error(`Key fingerprint changed for ${username}`)
+	}
+
+	const sharedKey = await deriveSharedKey(privateKey, peerPublicKey)
+
+	if (!pinned) {
+		await storePinnedPeerKey(username, await exportPublicKey(peerPublicKey), fingerprint)
+	}
+
+	return sharedKey
 }
