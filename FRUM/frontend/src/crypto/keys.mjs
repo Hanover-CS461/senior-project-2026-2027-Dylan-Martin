@@ -139,7 +139,7 @@ export async function decryptMessage(sharedKey, payload) {
             name: "AES-GCM",
             iv: new Uint8Array(payload.iv)
         },
-        sharedKey,getConversationKey,
+        sharedKey,
         payload.ciphertext
     );
 	return new TextDecoder().decode(arrayDecrypt);

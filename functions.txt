@@ -15,7 +15,7 @@ credentials API
     Returns: error status when the try catches an error. These include account does not exist, password and username required, incorrect password, database errors, and network errors. When successfully logged in and keys checked it should return a status code of 200 and return a json body containing the username and the bool variable to allow browser to generate key pairs for proper user.
 
 'api/keys':
-    Purpose: The purpose of this call is to update key data in mongoDB. Specifically public key and the keyFingerprint. This will use the function updateKeyDatabase provided in the database file. 
+    Purpose: The purpose of this call is to update key data in mongoDB. Specifically public key and the keyFingerprint. This will use the function updateKeyData provided in the database file. 
     Parameters: requeust param should hold username of user to update. As well as the public key and the public key fingerprint 
     Returns: error status when the try catches errors. These include public key fingerprint and username required, account does not exist to update keys, and database errors. When successfully updated return status 200.
 
@@ -39,7 +39,7 @@ To start required nodes and use cases:
     Returns: No returns only console.log of disconnection.
 
 'UsersExists'
-    Purpose: purpose of this function is to return a bool of whether the Users collection has been created in frum-mongo. Uses Mongoclient built in DB function to return list of collections that is then toArray(). Checks length of that Array and if it is 0 return false else return true
+    Purpose: purpose of this function is to return a bool of whether the Users collection has been created in frum-mongo. Uses Mongoclient built in DB function to return list of collections that is then toArray(). Filters by name first then Checks length of that Array and if it is 0 return false else return true
     Parameters: No parameters
     Returns: Checks length of Array and if it is 0 return false else return true
 
@@ -50,7 +50,7 @@ To start required nodes and use cases:
 
 'createUser'
     Purpose: function creates a user document and inserts into the Users collections. It uses built in Mongoclient function insertOne.
-    Parameters: username which a string for the users account name, passwordHash which i believe is an argon tag of size T bytes (argon2 docs needed), publicKey which defaults to null it is a cryptoKey object, fingerprintKey a SHA-256 digest also defualts to null.
+    Parameters: username which a string for the users account name, passwordHash which i believe is an argon tag of size T bytes (argon2 docs needed), publicKey which defaults to null it is a jwk of exported public key, fingerprintKey a SHA-256 digest also defualts to null.
     Returns: The result of the return of insertOne specifically the acknowledgement. Returns error code if the try catches an error. Specifically error 11000 for account already exists simplified.
 
 'removeUser' (deprecated for now not gonna allow account deletion in demo)
@@ -60,8 +60,8 @@ To start required nodes and use cases:
 
 'updateKeyData'
     Purpose: Update the users MongoDB exisiting doc with their public key after generation and a digest of that public key for later verification. Uses built in updateOne Mongoclient function. 
-    Parameters: username string of user account, key a cryptoKey object, and fingerprintKey a digest of the public key. 
-    Returns: error when the try catches and error and returns an error code similar to account existing however it is account does not exist. On success return the result of the updateOne function. 
+    Parameters: username string of user account, key a jwk export, and fingerprintKey a digest of the public key. 
+    Returns: returns request matchedCount for error checking
 
 'getUserHashedPassword'
     Purpose: Query the database and return the usernames hashedpassword field for verifcation during login. 
@@ -71,7 +71,7 @@ To start required nodes and use cases:
 'getPublicKey'
     Purpose: Query the database and return the usernames stored public key for shared secret and fingerprinting.
     Paramters: username a string of users account name
-    Returns: the public key cryptoKey object from usernames publicKey field. 
+    Returns: the public key wrapper of jwk export from usernames publicKey field. 
 
 Server
 Things to know: Runs database functions and listens on port for api calls in one file a separation of files.
@@ -101,7 +101,7 @@ I am going to skip all of the crypto api functions as i made a tutorial for them
 'fetchPeerKey'
     Purpose: Asks api to query database for stored public key of the user we would like to chat with. Import the public key for crypto use as well as fingerprint checking and verification.
     Parameters: username a string of the users account that we would like to chat with.
-    Returns: the imported public key cryptoKey object.
+    Returns: the imported public key jwk object.
 
 'getSharedKey'
     Purpose: derive the shared secret then shared key between the two users that are wanting to chat. Uses fetchPeerKey and getPinnedPeerKey if there is not a pinned key yet between user and who they are communicated with then we must pin the key and fingerprint. Each time they want to reconnect and talk again that pinned key is then verified (TOFU).
@@ -117,11 +117,73 @@ The index will hold three objectStores these will be named keys, peers, and mess
     Returns: A promise that resolves on success to the request result of opening the DB and rejects on error and returns the request result of opening the DB.
 
 'requestAsPromise'
-    Purpose: this funciton takes indexedDB queries and updates and returns them as promises which resolve or reject which is important for asynchronous executions. 
+    Purpose: this function takes indexedDB queries and updates and returns them as promises which resolve or reject which is important for asynchronous executions. 
     Parameters: requests is the index function that is being executed and want as a promise
     Returns: A promise that resolves on success of the index request and returns the result. Rejects on error and returns index request and returns the error.
 
 'getItem'
-    Purpose: open the key index and start a transaction that queries the index and gives a read only DOM object of the storeName and the item you want
+    Purpose: open the key index and start a transaction that queries the index and gives a read only IDBR request of the storeName and the item you want
     Parameters: storeName is the objectStoreName you want to pull a record from. Key is a string that is the record that you want to get
-    Returns: 
+    Returns: A promise of the index transaction
+
+'getAllItems'
+    Purpose: open the key index and start a transaction that queries the index and gives a read only DOM object of the storeName and gets all records
+    Parameters: storeName is the objectStoreName you want to pull all the records from
+    Returns: A promise of the index transaction
+
+'putItem'
+    Purpose: Puts a value in the key records name value spot. If the key is undefined then just put the value (no key needed i.e. messages). Else put the value in the key.
+    Parameters: storeName is the objectStoreName you want to pull a record from. Value is the updated value of the key value you want to change. Key is a string of the record you want to update.
+    Returns: A promise of the completion abortion or error of the transaction
+
+'deleteItem'
+    Purpose: Delete a records key and value from an objectStore
+    Parameters: storeName is t that we decrypt on loadhe objectStoreName you want to pull a record from. Key is a string that is the record that you want to delete
+    Returns: A promise of the completion abortion or error of the transaction
+
+'storePrivatekey'
+    Purpose: Store the generated private key to the index. in keys objectStore
+    Parameters: privateKey is the private cryptoKey object that we are storing
+    Returns: Promise of our putItem function which might be an IDRB request turned promise
+
+'getPrivateKey'
+    Purpose: retrieves the stored private key for secret derivation and shared key generation. in keys objectStore
+    Parameters: no parameters
+    Returns: Promise of our getItem function
+
+'storeIdentity'
+    Purpose: store the user account identity to the index. Identity is mentioned and explained in the initializeIdentity function located in crypto keys. in keys objectStore
+    Parameters: publicKey exported jwk object and the digest of the publicKey the fingerprint
+    Returns: Promise of our putItem funciton
+
+'getIdentity'
+    Purpose: retrieves the stored identity for key pair generation and key publishing. in keys objectStore
+    Parameters: no parameters
+    Returns: promise of our getItem function
+
+'storePinnedPeerKey'
+    Purpose: Stores information of peer that we are connecting with. Their username the retrieved public key and the fingerprint digest of the public key that we have produced browser side. also stores what time we pinned the peer key. stores into the peer objectStore
+    Parameters: username a string of the peers user account name, their public key jwk export that we have retrieved from database, and the fingerprint we have created for their public key jwk export (not the one they have stored under their username in db that is specifically for pinned peer key checks)
+    Returns: promise of our putItem function 
+
+'getPinnedPeerKey'
+    Purpose: retireves the stored pinnedPeerKey from the peers objectStore. 
+    Parameters: username is a string of the peers user account name
+    Returns: promise of our getItem function
+
+'storeMessage'
+    Purpose: Store sent or recieved message for later viewing. Decrypts messages on load and contains direction and timestamp params. 
+    Parameters: peer a string of the peers user account name, ciphertext which is the encrypted message. iv is the iv that was used to encrypt needed for decryption. direction is whether we are sending to our peer or our peer is sending to us. Timestamp is the time that the message was stored. (might change to when it was sent. Peer could send info with message)
+    Returns: promise of our putItem function
+
+'getMessagesForPeer'
+    Purpose: Get all of the messages stored in index for history view. sort them by timestamp and filter them out by peer. (separate connections are not stored different they are filtered by peer account name)
+    Parameters: peer a string of the peers user account name
+    Returns: a promise of our getAllItems function.
+
+Workflow will include what needs to happen under certain circumstances. To start we will do signup
+'on signup':
+    We need to create an account and update database with account name and hashedpassword. Key generation is left to login sign up is simple on success show back to login container and display any errors
+'on login':
+    We need to verify they are using the correct username and password before initializing their identity. obviously dont log them in when username or password is incorrect. If it is their first time logging in they will not have ran initializeIdentity yet. Login will need to check if the account needs a public key still in index. If it does need one it will then initializeIdentity() to generate key pairs then after this they must publish public key from key generation to mongodb for peer usage. Also needs to create an express session token. on success direct to chat pages display any errors.
+Web sockets connections to come. Basic is request connection using peer username given by our peer of course. Creating the connection and decyrpting and encrypting on send displaying messages retrieving and storing messages 

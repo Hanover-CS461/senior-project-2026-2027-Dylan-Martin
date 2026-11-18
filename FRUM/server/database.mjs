@@ -56,16 +56,11 @@ export async function removeUser(username) {
 }
 
 export async function udpateKeyData(username, key, fingerprint) {
-    try{
-        const result = await Users.updateOne(
-            { username: username },
-            { $set: { publicKey: key, keyFingerprint: fingerprint } }
-        );
-        return result;
-    } catch (error) {
-        return error.code
-    }
-    
+    const result = await Users.updateOne(
+        { username: username },
+        { $set: { publicKey: key, keyFingerprint: fingerprint } }
+    );
+    return result;
 
 }
 

@@ -106,8 +106,8 @@ export function getPinnedPeerKey(username) {
 	return getItem('peers', username);
 }
 
-export function storeMessage(peer, ciphertext, direction, timestamp = Date.now()) {
-	return putItem('messages', { peer, ciphertext, direction, timestamp });
+export function storeMessage(peer, ciphertext, iv, direction, timestamp = Date.now()) {
+	return putItem('messages', { peer, ciphertext, iv, direction, timestamp });
 }
 
 export async function getMessagesForPeer(peer) {
