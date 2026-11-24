@@ -4,22 +4,29 @@ import {
     createUser,
     getUserHashedPassword,
     getPublicKey,
-    udpateKeyData
+    removeUser
 } from '../database.mjs';
+
+import { isAuthenticated } from '../middleware/auth.js';
+import {
+    loginAttemptLimiter,
+    recordLoginFailure,
+    clearLoginFailures
+} from '../middleware/loginLimiter.mjs';
+import {
+    validSignupUsername,
+    validUsernameParam,
+    validPassword
+} from '../validation.mjs';
 
 const router = Router();
 
 router.post('/signup', async (req, res) => {
-    const username = req.body.username;
-    const password = req.body.password;
-    if (
-        typeof username !== 'string' ||
-        typeof password !== 'string' ||
-        !username.trim() ||
-        !password
-    ) {
+    const username = validSignupUsername(req.body.username);
+    const password = validPassword(req.body.password);
+    if (!username || !password) {
         return res.status(400).json({
-            error: "Username and password are required"
+            error: "Username must be 3-32 characters (letters, numbers, _ . -) and password is required"
         });
     }
 
@@ -43,15 +50,10 @@ router.post('/signup', async (req, res) => {
     }
 });
 
-router.post('/login', async (req, res) => {
-    const username = req.body.username;
-    const password = req.body.password;
-    if (
-        typeof username !== 'string' ||
-        typeof password !== 'string' ||
-        !username.trim() ||
-        !password
-    ) {
+router.post('/login', loginAttemptLimiter, async (req, res) => {
+    const username = validUsernameParam(req.body.username);
+    const password = validPassword(req.body.password);
+    if (!username || !password) {
         return res.status(400).json({
             error: "Username and password are required"
         });
@@ -62,18 +64,35 @@ router.post('/login', async (req, res) => {
         const userHashedPasswordField = await getUserHashedPassword(username);
 
         if (!userHashedPasswordField) {
+            recordLoginFailure(req);
             return res.status(401).json({ error: "Incorrect username or password" });
         }
 
         const isMatch = await verify(userHashedPasswordField.passwordHash, password);
 
         if (!isMatch) {
+            recordLoginFailure(req);
             return res.status(401).json({ error: "Incorrect password" });
         }
 
         const keyField = await getPublicKey(username);
         const needsPublicKey = !keyField || keyField.publicKey === null;
 
+        await new Promise((resolve, reject) => {
+            req.session.regenerate((err) => {
+                if (err) return reject(err);
+                resolve();
+            });
+        });
+        req.session.username = username;
+        // promise return created with help of opencode agent
+        await new Promise((resolve, reject) => {
+            req.session.save((err) => {
+                if (err) return reject(err);
+                resolve();
+            });
+        });
+        clearLoginFailures(req);
         return res.status(200).json({ username, needsPublicKey });
     } catch (error) {
         console.error(error);
@@ -81,54 +100,34 @@ router.post('/login', async (req, res) => {
     }
 });
 
-router.post('/keys', async (req, res) => {
-    const username = req.body.username;
-    const publicKey = req.body.publicKey;
-    const keyFingerprint = req.body.keyFingerprint;
-
-    if (
-        typeof username !== 'string' ||
-        !username.trim() ||
-        !publicKey ||
-        typeof keyFingerprint !== 'string' ||
-        !keyFingerprint
-    ) {
-        return res.status(400).json({
-            error: "username, publicKey, and keyFingerprint are required"
+router.delete('/logout', async (req, res) => {
+    try {
+        await new Promise((resolve, reject) => {
+            req.session.destroy((err) => {
+                if (err) return reject(err);
+                resolve();
+            });
+            res.clearCookie('connect.sid');
+            res.status(200).json("Logged out");
         });
-    }
-
-    try {
-        const result = await udpateKeyData(username, publicKey, keyFingerprint);
-
-        if (!result || result.matchedCount === 0) {
-            return res.status(404).json({ error: "Account does not exist" });
-        }
-
-        return res.sendStatus(200);
     } catch (error) {
-        console.error(error);
-        return res.status(500).json({ error: "Failed to store public key" });
+        res.status(500).json({ error: "failed to logout" });
     }
 });
 
-router.get('/keys/:username', async (req, res) => {
-    const username = req.params.username;
+router.get('/me', isAuthenticated, (req, res) => {
+    return res.status(200).json({ username: req.session.username });
+})
 
-
+router.delete('/removeUser', isAuthenticated, async (req, res) => {
+    const username = req.session.username;
     try {
-        const result = await getPublicKey(username);
-
-        if (!result || !result.publicKey) {
-            return res.status(404).json({ error: "Account does not exist" });
-        }
-
-        return res.status(200).json( result.publicKey );
+        const result = await removeUser(username);
+        res.status(204).json("Removed and logged out user");
     } catch (error) {
-        console.error(error);
-        res.status(500).json({ error: "Failed to retrieve public key" });
+        res.status(500).json({ error: "failed to remove account" });
     }
-});
+})
 
 
 export default router;

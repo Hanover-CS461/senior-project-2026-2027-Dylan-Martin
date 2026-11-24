@@ -1,3 +1,4 @@
+// written by opencode agent per request
 const DB_NAME = 'client storage';
 const DB_VERSION = 4;
 

@@ -1,6 +1,6 @@
 import { useState } from 'react'
-import { Link } from 'react-router'
-import { initializeIdentity, publishPublicKey } from '../../../src/crypto/keys.mjs'
+import { Link, useNavigate } from 'react-router'
+import { initializeIdentity, publishPublicKey } from '../../../src/crypto/cryptoKeys.mjs'
 import '../styles/auth.css'
 
 function LoginPage() {
@@ -8,11 +8,12 @@ function LoginPage() {
 	const [username, setUsername] = useState('')
 	const [password, setPassword] = useState('')
 	const [errorMessage, setErrorMessage] = useState('')
+	const navigate = useNavigate();
 	const verifyLogin = async () => {
 		setStatus('loading')
 		setErrorMessage('')
 		try {
-			const res = await fetch('/api/login', {
+			const res = await fetch('/api/credential/login', {
 				method: 'POST',
 				headers: { 'Content-Type': 'application/json' },
 				body: JSON.stringify({ username, password }),
@@ -28,12 +29,17 @@ function LoginPage() {
 					await publishPublicKey(data.username, identity)
 				}
 				setStatus('success')
+				handleSuccess()
 			}
 		} catch (error) {
 			setStatus('error') // only for network failure / server down
 			setErrorMessage("Server down")
 		}
 	}
+	const handleSuccess = () => {
+		navigate("/chat");
+	}
+
 	return (
 		<main className="login">
 			<div className="login__card">
@@ -47,13 +53,11 @@ function LoginPage() {
 				{status === 'loading' && (
 					<p className="input__loading">Please wait</p>
 				)}
-				{status === 'success' && (
-					<p className="input__success">Very nice</p>
-				)}
 				<input
 					className="input__username"
 					type="text"
 					placeholder="username"
+					maxLength={32}
 					value={username}
 					onChange={e => setUsername(e.target.value)}
 				/>
@@ -61,13 +65,11 @@ function LoginPage() {
 					className="input__password"
 					type="password"
 					placeholder="password"
+					maxLength={1024}
 					value={password}
 					onChange={e => setPassword(e.target.value)}
 				/>
 				<button className="input__login" onClick={verifyLogin}>Login</button>
-				<Link to="/chat" className="chat__button">
-					Start chatting
-				</Link>
 			</div>
 			<div className="login__signup">
 				<Link to="/signup" className="login__button">

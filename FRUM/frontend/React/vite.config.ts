@@ -15,6 +15,10 @@ export default defineConfig({
         target: 'http://localhost:3000', // Backend URL
         changeOrigin: true,              // Modifies the origin header
       },
+      '/ws': {
+        target: 'ws://localhost:3000',
+        ws: true,
+      },
     },
   },
 })

@@ -1,8 +1,9 @@
 import { useState } from 'react'
-import { Link } from 'react-router'
+import { Link, useNavigate } from 'react-router'
 import '../styles/auth.css'
 
 function SignupPage() {
+	const navigate = useNavigate()
 	const [status, setStatus] = useState('empty')
 	const [username, setUsername] = useState('')
 	const [password, setPassword] = useState('')
@@ -11,7 +12,7 @@ function SignupPage() {
 		setStatus('loading')
 		setErrorMessage('')
 		try {
-			const res = await fetch('/api/signup', {
+			const res = await fetch('/api/credential/signup', {
 				method: 'POST',
 				headers: { 'Content-Type': 'application/json' },
 				body: JSON.stringify({ username, password }),
@@ -28,6 +29,11 @@ function SignupPage() {
 			setStatus('error') // only for network failure / server down
 		}
 	}
+
+	function goToLogin() {
+		navigate("/login")
+	}
+
 	return (
 		<main className="signup">
 			<div className="signup__card">
@@ -42,12 +48,13 @@ function SignupPage() {
 					<p className="input__loading">Please wait</p>
 				)}
 				{status === 'success' && (
-					<p className="input__success">Very nice</p>
+					<button className="input__success" onClick={ goToLogin }>Go Login</button>
 				)}
 				<input
 					className="input__username"
 					type="text"
 					placeholder="username"
+					maxLength={32}
 					value={username}
 					onChange={e => setUsername(e.target.value)}
 				/>
@@ -55,6 +62,7 @@ function SignupPage() {
 					className="input__password"
 					type="password"
 					placeholder="password"
+					maxLength={1024}
 					value={password}
 					onChange={e => setPassword(e.target.value)}
 				/>

@@ -73,7 +73,8 @@
 
 /* Submit buttons: pressed in the same wax as the welcome seal. */
 .input__login,
-.input__signup {
+.input__signup,
+.input__success {
 	padding: 0.7rem 1rem;
 	font-family: var(--display);
 	font-size: 1.05rem;
@@ -90,21 +91,31 @@
 		transform 160ms ease;
 }
 
+.input__success {
+	justify-self: center;
+	padding: 0.45rem 0.9rem;
+	font-size: 0.9rem;
+}
+
 .input__login:hover,
 .input__login:focus-visible,
 .input__signup:hover,
-.input__signup:focus-visible {
+.input__signup:focus-visible,
+.input__success:hover,
+.input__success:focus-visible {
 	background-color: var(--crimson);
 	transform: translateY(-1px);
 }
 
 .input__login:active,
-.input__signup:active {
+.input__signup:active,
+.input__success:active {
 	transform: translateY(0);
 }
 
 .input__login:focus-visible,
-.input__signup:focus-visible {
+.input__signup:focus-visible,
+.input__success:focus-visible {
 	outline: 2px dashed var(--gold);
 	outline-offset: 4px;
 }
@@ -174,6 +185,7 @@
 @media (prefers-reduced-motion: reduce) {
 	.input__login,
 	.input__signup,
+	.input__success,
 	.login__button,
 	.signup__button,
 	.chat__button {
@@ -185,7 +197,10 @@
 	.input__login:active,
 	.input__signup:hover,
 	.input__signup:focus-visible,
-	.input__signup:active {
+	.input__signup:active,
+	.input__success:hover,
+	.input__success:focus-visible,
+	.input__success:active {
 		transform: none;
 	}
 }

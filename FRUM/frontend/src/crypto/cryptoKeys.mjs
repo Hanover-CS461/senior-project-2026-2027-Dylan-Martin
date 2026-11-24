@@ -1,3 +1,4 @@
+// co written agent and myself
 import {
 	storePrivateKey,
 	getPrivateKey,
@@ -46,6 +47,7 @@ export async function fingerprintPublicKey(publicKey) {
 	return formatFingerprint(digest);
 }
 
+// idea and structure came from opencode agent
 export async function initializeIdentity() {
 	const [existingPrivateKey, existingIdentity] = await Promise.all([
 		getPrivateKey(),
@@ -67,7 +69,7 @@ export async function initializeIdentity() {
 }
 
 export async function publishPublicKey(username, identity) {
-	const response = await fetch('/api/keys', {
+	const response = await fetch('/api/keys/key', {
 		method: 'POST',
 		headers: { 'Content-Type': 'application/json' },
 		body: JSON.stringify({
@@ -145,40 +147,50 @@ export async function decryptMessage(sharedKey, payload) {
 	return new TextDecoder().decode(arrayDecrypt);
 }
 
-export async function fetchPeerKey(username) {
-	const response = await fetch(`/api/keys/${encodeURIComponent(username)}`);
-
+export async function fetchPeerIdentity(username) {
+	const response = await fetch(`/api/keys/key/${encodeURIComponent(username)}`);
 
 	if (!response.ok) {
-		const error = await response.json();
-		throw new Error(error.error ?? 'Failed to retrieve  public key');
+		const error = await response.json().catch(() => null);
+		throw new Error(error?.error ?? 'Failed to retrieve public key');
 	}
 
-	const pKey = await response.json();
+	const { publicKey, keyFingerprint } = await response.json();
+	const importedKey = await importPublicKey(publicKey);
+	const fingerprint = await fingerprintPublicKey(importedKey);
 
-	const importedKey = await importPublicKey(pKey);
+	if (fingerprint !== keyFingerprint) {
+		throw new Error(`Key fingerprint mismatch for ${username}`);
+	}
 
-	return importedKey;
+	return { publicKey: importedKey, rawPublicKey: publicKey, fingerprint };
+}
+
+export async function fetchPeerKey(username) {
+	return (await fetchPeerIdentity(username)).publicKey;
+}
+
+export async function verifyPeerIdentity(username) {
+	const identity = await fetchPeerIdentity(username);
+	const pinned = await getPinnedPeerKey(username);
+
+	if (pinned && pinned.fingerprint !== identity.fingerprint) {
+		throw new Error(`Key fingerprint changed for ${username}`);
+	}
+
+	if (!pinned) {
+		await storePinnedPeerKey(username, identity.rawPublicKey, identity.fingerprint);
+	}
+
+	return identity;
 }
 
 export async function getSharedKey(username) {
-	const privateKey = await getPrivateKey()
+	const privateKey = await getPrivateKey();
 	if (!privateKey) {
-		throw new Error('No local identity; run initializeIdentity first')
-	}
-	const peerPublicKey = await fetchPeerKey(username)
-	const fingerprint = await fingerprintPublicKey(peerPublicKey)
-
-	const pinned = await getPinnedPeerKey(username)
-	if (pinned && pinned.fingerprint !== fingerprint) {
-		throw new Error(`Key fingerprint changed for ${username}`)
+		throw new Error('No local identity; run initializeIdentity first');
 	}
 
-	const sharedKey = await deriveSharedKey(privateKey, peerPublicKey)
-
-	if (!pinned) {
-		await storePinnedPeerKey(username, await exportPublicKey(peerPublicKey), fingerprint)
-	}
-
-	return sharedKey
+	const identity = await verifyPeerIdentity(username);
+	return deriveSharedKey(privateKey, identity.publicKey);
 }
